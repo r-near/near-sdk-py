@@ -11,11 +11,8 @@ from .log import Log
 from .value_return import ValueReturn
 from .cross_contract import CrossContract
 from .decorators import export, contract_method, view, call, init
+from .constants import ONE_TGAS, MAX_GAS, ONE_NEAR
 
-# Constants
-ONE_NEAR = 10**24  # 1 NEAR in yoctoNEAR
-ONE_TGAS = 10**12  # 1 TeraGas
-MAX_GAS = 300 * ONE_TGAS  # 300 TGas
 
 # Type definitions
 AccountId = str

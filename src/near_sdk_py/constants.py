@@ -1,0 +1,3 @@
+ONE_NEAR = 10**24  # 1 NEAR in yoctoNEAR
+ONE_TGAS = 10**12  # 1 TeraGas
+MAX_GAS = 300 * ONE_TGAS  # 300 TGas

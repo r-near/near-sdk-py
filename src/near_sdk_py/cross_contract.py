@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 else:
     import near
 # Import constants
-from . import ONE_TGAS
+from .constants import ONE_TGAS
 
 MAX_GAS = 300 * ONE_TGAS  # 300 TGas
 
