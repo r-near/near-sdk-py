@@ -2,12 +2,7 @@
 Access to blockchain context information for NEAR smart contracts.
 """
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from near_py_tool import near
-else:
-    import near
+import near
 
 
 class Context:

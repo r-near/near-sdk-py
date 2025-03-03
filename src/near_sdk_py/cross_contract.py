@@ -5,10 +5,7 @@ Utilities for cross-contract calls in NEAR smart contracts.
 import json
 from typing import Any, List, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from near_py_tool import near
-else:
-    import near
+import near
 # Import constants
 from .constants import ONE_TGAS
 

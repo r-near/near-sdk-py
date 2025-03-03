@@ -5,10 +5,7 @@ Higher-level storage operations for NEAR smart contracts.
 import json
 from typing import Any, List, Optional, Union, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from near_py_tool import near
-else:
-    import near
+import near
 from .contract import StorageError
 
 

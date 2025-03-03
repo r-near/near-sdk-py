@@ -5,10 +5,7 @@ Input handling utilities for NEAR smart contracts.
 import json
 from typing import Any, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from near_py_tool import near
-else:
-    import near
+import near
 from .contract import InputError
 
 
