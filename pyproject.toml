@@ -1,6 +1,6 @@
 [project]
 name = "near-sdk-py"
-version = "0.1.1"
+version = "0.1.2"
 description = "A higher-level API for building NEAR smart contracts in Python."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,10 +13,12 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
-    "near-py-tool>=0.1.26",
     "ruff>=0.9.9",
 ]
 
 [[tool.mypy.overrides]]
 module = ["near_py_tool.*"]
 follow_untyped_imports = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/near", "src/near_sdk_py"]
