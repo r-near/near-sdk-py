@@ -2,7 +2,7 @@
 Decorator utilities for NEAR smart contracts.
 """
 
-from typing import Any, Callable, TypeVar, TYPE_CHECKING
+from typing import Any, Callable, TypeVar
 
 import near
 from .input import Input

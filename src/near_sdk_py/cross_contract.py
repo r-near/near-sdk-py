@@ -3,9 +3,10 @@ Utilities for cross-contract calls in NEAR smart contracts.
 """
 
 import json
-from typing import Any, List, TYPE_CHECKING
+from typing import Any, List
 
 import near
+
 # Import constants
 from .constants import ONE_TGAS
 

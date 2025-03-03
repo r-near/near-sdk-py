@@ -2,8 +2,6 @@
 Base contract class and contract-related exceptions.
 """
 
-from typing import TYPE_CHECKING
-
 import near
 
 

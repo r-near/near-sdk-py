@@ -3,7 +3,7 @@ Logging utilities for NEAR smart contracts.
 """
 
 import json
-from typing import Any, Dict, TYPE_CHECKING
+from typing import Any, Dict
 
 import near
 

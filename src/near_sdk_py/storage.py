@@ -3,7 +3,7 @@ Higher-level storage operations for NEAR smart contracts.
 """
 
 import json
-from typing import Any, List, Optional, Union, TYPE_CHECKING
+from typing import Any, List, Optional, Union
 
 import near
 from .contract import StorageError

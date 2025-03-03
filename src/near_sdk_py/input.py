@@ -3,7 +3,7 @@ Input handling utilities for NEAR smart contracts.
 """
 
 import json
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 import near
 from .contract import InputError
