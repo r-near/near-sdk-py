@@ -2,12 +2,9 @@
 Decorator utilities for NEAR smart contracts.
 """
 
-from typing import Any, Callable, TypeVar, TYPE_CHECKING
+from typing import Any, Callable, TypeVar
 
-if TYPE_CHECKING:
-    from near_py_tool import near
-else:
-    import near
+import near
 from .input import Input
 from .log import Log
 from .value_return import ValueReturn

@@ -1,6 +1,6 @@
 [project]
 name = "near-sdk-py"
-version = "0.1.2"
+version = "0.1.3"
 description = "A higher-level API for building NEAR smart contracts in Python."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,9 +16,13 @@ dev = [
     "ruff>=0.9.9",
 ]
 
-[[tool.mypy.overrides]]
-module = ["near_py_tool.*"]
-follow_untyped_imports = true
-
 [tool.hatch.build.targets.wheel]
 packages = ["src/near", "src/near_sdk_py"]
+
+[tool.semantic_release]
+version_toml = [
+    "pyproject.toml:project.version"
+]
+branch = "near-module"
+changelog_file = "CHANGELOG.md"
+commit_message = "chore(release): {version}"

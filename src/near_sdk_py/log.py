@@ -3,12 +3,9 @@ Logging utilities for NEAR smart contracts.
 """
 
 import json
-from typing import Any, Dict, TYPE_CHECKING
+from typing import Any, Dict
 
-if TYPE_CHECKING:
-    from near_py_tool import near
-else:
-    import near
+import near
 
 
 class Log:
