@@ -1,6 +1,24 @@
 # CHANGELOG
 
 
+## v0.2.0 (2025-03-04)
+
+### Documentation
+
+- Update README
+  ([`ef14f6a`](https://github.com/r-near/near-sdk-py/commit/ef14f6ab788404542320d1cda5efd58100db7e6f))
+
+### Features
+
+- Add Simplified Promise API with Callback Support
+  ([#3](https://github.com/r-near/near-sdk-py/pull/3),
+  [`fd79fbd`](https://github.com/r-near/near-sdk-py/commit/fd79fbdf50d388cb8808fa51a9ca048a8e5eacce))
+
+* feat: Add a high-level promises API
+
+* docs: Add info on Promises usage
+
+
 ## v0.1.2 (2025-03-04)
 
 ### Bug Fixes
