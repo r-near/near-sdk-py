@@ -43,7 +43,7 @@ wheels = [
 
 [[package]]
 name = "near-sdk-py"
-version = "0.1.7"
+version = "0.1.1"
 source = { editable = "." }
 
 [package.dev-dependencies]
