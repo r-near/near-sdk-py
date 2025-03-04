@@ -31,8 +31,8 @@ def get_greeting():
 ## 📋 Installation
 
 ```bash
-# Install using pip & uv
-uv pip install near-sdk-py
+# Install using uv
+uv add near-sdk-py
 
 # Traditional pip install
 pip install near-sdk-py
@@ -76,31 +76,42 @@ get_greeting = contract.get_greeting
 
 ### 2️⃣ Build and Deploy
 
-Use `near-py-tool` to build and deploy your contract:
+Use [nearc](https://github.com/r-near/nearc) to compile your contract:
 
 ```bash
 # Create a new project
-near-py-tool new greeting-contract
-
-# Copy your contract code into the project directory
-cp my_contract.py greeting-contract/
-
-# Build the contract
+uv init greeting-contract
 cd greeting-contract
-near-py-tool build
 
-# Deploy to testnet
-near-py-tool deploy testnet
+# Install the SDK
+uv add near-sdk-py
+
+# Create your contract file
+# (Copy your contract code into contract.py)
+
+# Compile the contract
+uvx nearc contract.py
 ```
 
-### 3️⃣ Interact with your Contract
+This will generate a WebAssembly (`.wasm`) file that can be deployed to the NEAR blockchain.
+
+### 3️⃣ Deploy to NEAR
+
+After compiling your contract, use the NEAR CLI to deploy it:
+
+```bash
+# Deploy to testnet
+near deploy your-contract.testnet contract.wasm --networkId testnet
+```
+
+### 4️⃣ Interact with your Contract
 
 ```bash
 # Call view methods (free)
-near view greeting-contract.testnet get_greeting
+near view your-contract.testnet get_greeting
 
 # Call methods that change state (costs gas)
-near call greeting-contract.testnet set_greeting '{"message":"Hello from CLI"}' --accountId your-account.testnet
+near call your-contract.testnet set_greeting '{"message":"Hello from CLI"}' --accountId your-account.testnet
 ```
 
 ## 📚 SDK Components
