@@ -2,6 +2,8 @@ name: Release
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   pypi:
@@ -15,18 +17,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-            fetch-tags: true
-            fetch-depth: 0
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-            enable-cache: true
+          enable-cache: true
 
       - name: Create release
         run: uvx python-semantic-release -vv version
         env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish to PyPI
         run: uv publish --trusted-publishing always
