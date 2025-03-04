@@ -18,3 +18,11 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/near", "src/near_sdk_py"]
+
+[tool.semantic_release]
+version_toml = [
+    "pyproject.toml:project.version"
+]
+branch = "near-module"
+changelog_file = "CHANGELOG.md"
+commit_message = "chore(release): {version}"
