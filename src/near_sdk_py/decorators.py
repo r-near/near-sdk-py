@@ -12,6 +12,49 @@ from .value_return import ValueReturn
 T = TypeVar("T")
 
 
+def callback_method(func: Callable[..., T]) -> Callable[..., T]:
+    """
+    Decorator for contract callback methods that handles promise results
+
+    When using this decorator:
+    - Your method will have access to the promise result data
+    - The promise status will be checked automatically
+    - The return value will be properly serialized
+
+    Your method signature should accept a `promise_result` parameter which will
+    contain a dictionary with 'status', 'status_code', and 'data' keys.
+    """
+
+    def wrapper(*args, **kwargs):
+        # Get the promise result
+        status_code, data = near.promise_result(0)
+
+        # Create a result object
+        promise_result = {
+            "status_code": status_code,
+            "status": ["NotReady", "Successful", "Failed"][status_code]
+            if 0 <= status_code <= 2
+            else "Unknown",
+            "data": data,
+        }
+
+        # Call the function with the promise result
+        kwargs["promise_result"] = promise_result
+        result = func(*args, **kwargs)
+
+        # Handle the return value
+        if result is not None:
+            if isinstance(result, bytes):
+                ValueReturn.bytes(result)
+            elif isinstance(result, str):
+                ValueReturn.string(result)
+            else:
+                ValueReturn.json(result)
+        return result
+
+    return wrapper
+
+
 def contract_method(func: Callable[..., T]) -> Callable[..., T]:
     """
     Decorator for contract methods that handles input deserialization
@@ -80,3 +123,10 @@ def init(func: Callable[..., Any]) -> Callable[..., Any]:
     Decorator for contract initialization methods
     """
     return export(func)
+
+
+def callback(func: Callable[..., Any]) -> Callable[..., Any]:
+    """
+    Decorator for callback methods that handle promise results
+    """
+    return near.export(callback_method(func))

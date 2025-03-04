@@ -167,32 +167,50 @@ Log.event("nft_mint", {
 
 ### Cross-Contract Calls
 
+Work with NEAR's asynchronous cross-contract calls using the Promises API:
+
 ```python
-# Call another contract
-promise = CrossContract.call(
-    "nft.example.near",      # Contract account
-    "nft_transfer",          # Method name
-    {                        # Arguments
-        "receiver_id": "bob.near", 
-        "token_id": "token-123"
-    },
-    1,                       # Attached deposit (1 yoctoNEAR)
-    10 * ONE_TGAS            # Gas to attach (10 TGas)
-)
+from near_sdk_py import call, callback, CrossContract, ONE_TGAS
 
-# Add a callback for when the call completes
-callback = CrossContract.then(
-    promise,                         # Previous promise
-    Context.current_account_id(),    # This contract
-    "on_transfer_complete",          # Callback method
-    {"user": "alice.near"},          # Arguments
-    0,                               # No deposit
-    5 * ONE_TGAS                     # Gas (5 TGas)
-)
+class MyContract:
+    @call
+    def update_profile(self, username: str):
+        return CrossContract.call_with_callback(
+            "profile.near",               # Target contract
+            "set_username",               # Method to call
+            {"username": username},       # Arguments
+            gas=5 * ONE_TGAS,             # Gas for the call
+            callback_method="on_update_complete"  # Our callback
+        )
 
-# Return the result from the callback
-CrossContract.return_value(callback)
+    @callback
+    def on_update_complete(self, promise_result: dict):
+        if promise_result["status"] == "Successful":
+            return "Profile updated successfully!"
+        else:
+            return "Update failed!"
 ```
+
+The `@callback` decorator helps process responses from other contracts, while `CrossContract.call_with_callback()` streamlines the common pattern of making a call and handling its result.
+
+For advanced use cases, you can also build promise chains manually:
+
+```python
+# Make initial call
+promise = CrossContract.call("token.near", "get_balance", {"account_id": "alice.near"})
+
+# Chain a callback to process the result
+callback = CrossContract.then(
+    promise,
+    CrossContract.current_account_id(),
+    "on_balance_received"
+)
+
+# Return the final result
+return CrossContract.return_value(callback)
+```
+
+See the [Promises API documentation](docs/promises-api.md) for more detailed examples.
 
 ## 🔐 Security Best Practices
 

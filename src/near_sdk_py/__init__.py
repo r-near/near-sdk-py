@@ -10,7 +10,7 @@ from .context import Context
 from .log import Log
 from .value_return import ValueReturn
 from .cross_contract import CrossContract
-from .decorators import export, contract_method, view, call, init
+from .decorators import export, contract_method, view, call, init, callback
 from .constants import ONE_TGAS, MAX_GAS, ONE_NEAR
 
 
@@ -36,6 +36,7 @@ __all__ = [
     "view",
     "call",
     "init",
+    "callback",
     "ONE_NEAR",
     "ONE_TGAS",
     "MAX_GAS",
