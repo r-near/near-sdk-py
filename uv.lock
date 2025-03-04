@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.11"
 
 [[package]]
@@ -43,7 +44,7 @@ wheels = [
 
 [[package]]
 name = "near-sdk-py"
-version = "0.1.1"
+version = "0.1.3"
 source = { editable = "." }
 
 [package.dev-dependencies]
