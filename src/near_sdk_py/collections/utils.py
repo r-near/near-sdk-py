@@ -2,33 +2,56 @@
 Utility functions for working with collection prefixes.
 """
 
-from typing import Any, Callable
+from typing import Any, Callable  # Keep typing for docs
 
 
-def create_enum_prefix(enum_type: type, enum_value: Any) -> str:
+def create_enum_prefix(enum_type: Any, enum_value: Any) -> str:
     """
     Create a prefix from an enum value.
     This is useful for ensuring each collection has a unique prefix.
 
+    Adapted to work with MicroPython by accepting any type with name attributes.
+
     Example:
     ```python
-    class StorageKey(Enum):
+    # Instead of using Enum, define a class with constants
+    class StorageKey:
         TOKENS = 1
         BALANCES = 2
         APPROVALS = 3
+
+        # Add names corresponding to values
+        names = {
+            TOKENS: "TOKENS",
+            BALANCES: "BALANCES",
+            APPROVALS: "APPROVALS"
+        }
+
+        @property
+        def name(self):
+            return self.names[self]
+
+    # Create instances
+    StorageKey.TOKENS = StorageKey()
+    StorageKey.BALANCES = StorageKey()
+    StorageKey.APPROVALS = StorageKey()
 
     tokens = Vector(create_enum_prefix(StorageKey, StorageKey.TOKENS))
     balances = UnorderedMap(create_enum_prefix(StorageKey, StorageKey.BALANCES))
     ```
 
     Args:
-        enum_type: The enum class
-        enum_value: The enum value
+        enum_type: The class with name attributes
+        enum_value: The value with a name property
 
     Returns:
         A string prefix
     """
-    return f"{enum_type.__name__}:{enum_value.name}"
+    # Access name through a property or attribute
+    name = enum_value.name if hasattr(enum_value, "name") else str(enum_value)
+    type_name = enum_type.__name__ if hasattr(enum_type, "__name__") else str(enum_type)
+
+    return f"{type_name}:{name}"
 
 
 def create_prefix_guard(base_prefix: str) -> Callable[[str], str]:

@@ -2,7 +2,7 @@
 LookupSet collection for NEAR smart contracts.
 """
 
-from typing import Generic, TypeVar
+from typing import Any  # Keep typing for docs
 
 import near
 
@@ -10,10 +10,7 @@ from .adapter import CollectionStorageAdapter
 from .base import Collection, PrefixType
 
 
-T = TypeVar("T")  # Element type
-
-
-class LookupSet(Collection, Generic[T]):
+class LookupSet(Collection):
     """
     A non-iterable persistent set implementation for NEAR.
 
@@ -30,7 +27,7 @@ class LookupSet(Collection, Generic[T]):
         """
         super().__init__(prefix, PrefixType.LOOKUP_SET)
 
-    def __contains__(self, value: T) -> bool:
+    def __contains__(self, value: Any) -> bool:
         """
         Check if the set contains the given value.
 
@@ -43,7 +40,7 @@ class LookupSet(Collection, Generic[T]):
         storage_key = self._make_key(value)
         return near.storage_has_key(storage_key)
 
-    def add(self, value: T) -> None:
+    def add(self, value: Any) -> None:
         """
         Add a value to the set.
 
@@ -58,7 +55,7 @@ class LookupSet(Collection, Generic[T]):
             CollectionStorageAdapter.write(storage_key, True)
             self._set_length(len(self) + 1)
 
-    def remove(self, value: T) -> None:
+    def remove(self, value: Any) -> None:
         """
         Remove a value from the set.
 
@@ -76,7 +73,7 @@ class LookupSet(Collection, Generic[T]):
         CollectionStorageAdapter.remove(storage_key)
         self._set_length(len(self) - 1)
 
-    def discard(self, value: T) -> None:
+    def discard(self, value: Any) -> None:
         """
         Remove a value from the set if it exists.
 

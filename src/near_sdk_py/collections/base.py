@@ -2,8 +2,7 @@
 Base collection class for NEAR persistent collections.
 """
 
-from enum import Enum
-from typing import Any, Dict, cast
+from typing import Any, Dict
 
 import near
 from near_sdk_py.contract import StorageError
@@ -11,8 +10,9 @@ from near_sdk_py.contract import StorageError
 from .adapter import CollectionStorageAdapter
 
 
-class PrefixType(Enum):
-    """Enum for collection prefix types"""
+# Replace Enum with string constants
+class PrefixType:
+    """Constants for collection prefix types"""
 
     VECTOR = "v"
     LOOKUP_MAP = "m"
@@ -25,7 +25,7 @@ class PrefixType(Enum):
 class Collection:
     """Base class for all persistent collections"""
 
-    def __init__(self, prefix: str, collection_type: PrefixType):
+    def __init__(self, prefix: str, collection_type: str):
         """
         Initialize a collection with a unique prefix.
 
@@ -44,7 +44,7 @@ class Collection:
 
         # Initialize metadata if it doesn't exist
         if not near.storage_has_key(self._metadata_key):
-            metadata = {"type": collection_type.value, "length": 0, "version": "1.0.0"}
+            metadata = {"type": collection_type, "length": 0, "version": "1.0.0"}
             CollectionStorageAdapter.write(self._metadata_key, metadata)
 
     def _get_metadata(self) -> Dict[str, Any]:
@@ -52,7 +52,7 @@ class Collection:
         result = CollectionStorageAdapter.read(self._metadata_key)
         if result is None:
             raise StorageError(f"Metadata missing for collection {self._prefix}")
-        return cast(Dict[str, Any], result)
+        return result
 
     def _update_metadata(self, updates: Dict[str, Any]) -> None:
         """Updates the collection metadata"""

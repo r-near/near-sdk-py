@@ -2,7 +2,7 @@
 UnorderedSet collection for NEAR smart contracts.
 """
 
-from typing import Iterator, List, TypeVar
+from typing import Any, Iterator, List  # Keep typing for docs
 
 import near
 
@@ -12,10 +12,7 @@ from .lookup_set import LookupSet
 from .vector import Vector
 
 
-T = TypeVar("T")  # Element type
-
-
-class UnorderedSet(LookupSet[T]):
+class UnorderedSet(LookupSet):
     """
     An iterable persistent set implementation for NEAR.
 
@@ -32,13 +29,13 @@ class UnorderedSet(LookupSet[T]):
         """
         super().__init__(prefix)
         # Override the collection type
-        self._update_metadata({"type": PrefixType.UNORDERED_SET.value})
+        self._update_metadata({"type": PrefixType.UNORDERED_SET})
 
         # Vector for storing the values for iteration
         self._values_prefix = f"{prefix}:values"
-        self._values_vector = Vector[T](self._values_prefix)
+        self._values_vector = Vector(self._values_prefix)
 
-    def add(self, value: T) -> None:
+    def add(self, value: Any) -> None:
         """
         Add a value to the set and track it for iteration.
 
@@ -55,7 +52,7 @@ class UnorderedSet(LookupSet[T]):
             self._values_vector.append(value)
             self._set_length(len(self) + 1)
 
-    def remove(self, value: T) -> None:
+    def remove(self, value: Any) -> None:
         """
         Remove a value from the set and untrack it.
 
@@ -81,11 +78,11 @@ class UnorderedSet(LookupSet[T]):
 
         self._set_length(len(self) - 1)
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator:
         """Return an iterator over the values"""
         return iter(self._values_vector)
 
-    def values(self) -> List[T]:
+    def values(self) -> List:
         """Return a list of all values"""
         return list(self._values_vector)
 

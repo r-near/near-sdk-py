@@ -3,15 +3,11 @@ Vector collection for NEAR smart contracts.
 """
 
 from typing import (
-    Generic,
+    Any,
     Iterable,
     Iterator,
-    List,
     Optional,
-    TypeVar,
     Union,
-    cast,
-    overload,
 )
 
 from near_sdk_py.contract import StorageError
@@ -20,10 +16,7 @@ from .adapter import CollectionStorageAdapter
 from .base import Collection, PrefixType
 
 
-T = TypeVar("T")  # Element type
-
-
-class Vector(Collection, Generic[T]):
+class Vector(Collection):
     """
     A persistent vector (array) implementation for NEAR.
 
@@ -40,13 +33,7 @@ class Vector(Collection, Generic[T]):
         """
         super().__init__(prefix, PrefixType.VECTOR)
 
-    @overload
-    def __getitem__(self, index: int) -> T: ...
-
-    @overload
-    def __getitem__(self, index: slice) -> List[T]: ...
-
-    def __getitem__(self, index: Union[int, slice]) -> Union[T, List[T]]:
+    def __getitem__(self, index: Union[int, slice]) -> Any:
         """
         Get an item or slice of items from the vector.
 
@@ -62,7 +49,7 @@ class Vector(Collection, Generic[T]):
         if isinstance(index, slice):
             # Handle slices
             start, stop, step = index.indices(len(self))
-            result: List[T] = []
+            result = []
             for i in range(start, stop, step):
                 item = self[i]
                 result.append(item)
@@ -84,9 +71,9 @@ class Vector(Collection, Generic[T]):
         if value is None:
             raise StorageError(f"Missing value for index {index}")
 
-        return cast(T, value)
+        return value
 
-    def __setitem__(self, index: int, value: T) -> None:
+    def __setitem__(self, index: int, value: Any) -> None:
         """
         Set an item at the specified index.
 
@@ -110,7 +97,7 @@ class Vector(Collection, Generic[T]):
         key = self._make_index_key(index)
         CollectionStorageAdapter.write(key, value)
 
-    def append(self, value: T) -> None:
+    def append(self, value: Any) -> None:
         """
         Add an element to the end of the vector.
 
@@ -122,7 +109,7 @@ class Vector(Collection, Generic[T]):
         CollectionStorageAdapter.write(key, value)
         self._set_length(length + 1)
 
-    def pop(self, index: int = -1) -> T:
+    def pop(self, index: int = -1) -> Any:
         """
         Remove and return an element at the given index.
         Default is to remove the last element.
@@ -169,9 +156,9 @@ class Vector(Collection, Generic[T]):
         # Update length
         self._set_length(length - 1)
 
-        return cast(T, value)
+        return value
 
-    def swap_remove(self, index: int) -> T:
+    def swap_remove(self, index: int) -> Any:
         """
         Remove an element by swapping it with the last element and then removing it.
         This is more efficient than pop() for cases where order doesn't matter.
@@ -217,9 +204,9 @@ class Vector(Collection, Generic[T]):
         # Update length
         self._set_length(length - 1)
 
-        return cast(T, value)
+        return value
 
-    def extend(self, items: Iterable[T]) -> None:
+    def extend(self, items: Iterable) -> None:
         """
         Append multiple items to the vector.
 
@@ -248,12 +235,12 @@ class Vector(Collection, Generic[T]):
         # Reset length
         self._set_length(0)
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator:
         """Return an iterator over the elements"""
         for i in range(len(self)):
-            yield cast(T, self[i])
+            yield self[i]
 
-    def get(self, index: int, default: Optional[T] = None) -> Optional[T]:
+    def get(self, index: int, default: Optional[Any] = None) -> Any:
         """
         Get an element at the specified index, or return default if index is out of bounds.
 

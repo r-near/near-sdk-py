@@ -2,7 +2,7 @@
 LookupMap collection for NEAR smart contracts.
 """
 
-from typing import Generic, Optional, TypeVar, cast
+from typing import Any, Optional
 
 import near
 
@@ -10,11 +10,7 @@ from .adapter import CollectionStorageAdapter
 from .base import Collection, PrefixType
 
 
-K = TypeVar("K")  # Key type
-V = TypeVar("V")  # Value type
-
-
-class LookupMap(Collection, Generic[K, V]):
+class LookupMap(Collection):
     """
     A non-iterable persistent map implementation for NEAR.
 
@@ -31,7 +27,7 @@ class LookupMap(Collection, Generic[K, V]):
         """
         super().__init__(prefix, PrefixType.LOOKUP_MAP)
 
-    def __getitem__(self, key: K) -> V:
+    def __getitem__(self, key: Any) -> Any:
         """
         Get the value for the given key.
 
@@ -50,9 +46,9 @@ class LookupMap(Collection, Generic[K, V]):
         if value is None:
             raise KeyError(key)
 
-        return cast(V, value)
+        return value
 
-    def __setitem__(self, key: K, value: V) -> None:
+    def __setitem__(self, key: Any, value: Any) -> None:
         """
         Set the value for the given key.
 
@@ -69,7 +65,7 @@ class LookupMap(Collection, Generic[K, V]):
         if not exists:
             self._set_length(len(self) + 1)
 
-    def __delitem__(self, key: K) -> None:
+    def __delitem__(self, key: Any) -> None:
         """
         Remove the given key.
 
@@ -87,7 +83,7 @@ class LookupMap(Collection, Generic[K, V]):
         CollectionStorageAdapter.remove(storage_key)
         self._set_length(len(self) - 1)
 
-    def __contains__(self, key: K) -> bool:
+    def __contains__(self, key: Any) -> bool:
         """
         Check if the map contains the given key.
 
@@ -100,7 +96,7 @@ class LookupMap(Collection, Generic[K, V]):
         storage_key = self._make_key(key)
         return near.storage_has_key(storage_key)
 
-    def get(self, key: K, default: Optional[V] = None) -> Optional[V]:
+    def get(self, key: Any, default: Optional[Any] = None) -> Any:
         """
         Get the value for the given key, or default if the key doesn't exist.
 
@@ -116,7 +112,7 @@ class LookupMap(Collection, Generic[K, V]):
         except KeyError:
             return default
 
-    def set(self, key: K, value: V) -> None:
+    def set(self, key: Any, value: Any) -> None:
         """
         Set the value for the given key.
         Alias for __setitem__.
@@ -127,7 +123,7 @@ class LookupMap(Collection, Generic[K, V]):
         """
         self[key] = value
 
-    def remove(self, key: K) -> Optional[V]:
+    def remove(self, key: Any) -> Optional[Any]:
         """
         Remove the given key and return its value.
 

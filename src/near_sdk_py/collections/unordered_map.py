@@ -2,7 +2,7 @@
 UnorderedMap collection for NEAR smart contracts.
 """
 
-from typing import Iterator, List, TypeVar, Tuple
+from typing import Any, Iterator, List, Tuple  # Keep typing for docs
 
 import near
 
@@ -12,11 +12,7 @@ from .lookup_map import LookupMap
 from .vector import Vector
 
 
-K = TypeVar("K")  # Key type
-V = TypeVar("V")  # Value type
-
-
-class UnorderedMap(LookupMap[K, V]):
+class UnorderedMap(LookupMap):
     """
     An iterable persistent map implementation for NEAR.
 
@@ -33,13 +29,13 @@ class UnorderedMap(LookupMap[K, V]):
         """
         super().__init__(prefix)
         # Override the collection type
-        self._update_metadata({"type": PrefixType.UNORDERED_MAP.value})
+        self._update_metadata({"type": PrefixType.UNORDERED_MAP})
 
         # Key for storing the list of keys
         self._keys_prefix = f"{prefix}:keys"
-        self._keys_vector = Vector[K](self._keys_prefix)
+        self._keys_vector = Vector(self._keys_prefix)
 
-    def __setitem__(self, key: K, value: V) -> None:
+    def __setitem__(self, key: Any, value: Any) -> None:
         """
         Set the value for the given key and track the key for iteration.
 
@@ -58,7 +54,7 @@ class UnorderedMap(LookupMap[K, V]):
             self._keys_vector.append(key)
             self._set_length(len(self) + 1)
 
-    def __delitem__(self, key: K) -> None:
+    def __delitem__(self, key: Any) -> None:
         """
         Remove the given key and untrack it.
 
@@ -84,19 +80,19 @@ class UnorderedMap(LookupMap[K, V]):
 
         self._set_length(len(self) - 1)
 
-    def __iter__(self) -> Iterator[K]:
+    def __iter__(self) -> Iterator:
         """Return an iterator over the keys"""
         return iter(self._keys_vector)
 
-    def keys(self) -> List[K]:
+    def keys(self) -> List:
         """Return a list of all keys"""
         return list(self._keys_vector)
 
-    def values(self) -> List[V]:
+    def values(self) -> List:
         """Return a list of all values"""
         return [self[key] for key in self._keys_vector]
 
-    def items(self) -> List[Tuple[K, V]]:
+    def items(self) -> List[Tuple]:
         """Return a list of all (key, value) pairs"""
         return [(key, self[key]) for key in self._keys_vector]
 

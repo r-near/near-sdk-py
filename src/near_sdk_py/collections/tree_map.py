@@ -2,16 +2,7 @@
 TreeMap collection for NEAR smart contracts.
 """
 
-from typing import (
-    Generic,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-    cast,
-    Protocol,
-)
+from typing import Any, Iterator, List, Optional, Tuple  # Keep typing for docs
 
 import near
 from near_sdk_py.contract import StorageError
@@ -21,20 +12,7 @@ from .base import Collection, PrefixType
 from .vector import Vector
 
 
-class Comparable(Protocol):
-    """Protocol for comparable types"""
-
-    def __lt__(self, other: "Comparable") -> bool: ...
-    def __gt__(self, other: "Comparable") -> bool: ...
-    def __le__(self, other: "Comparable") -> bool: ...
-    def __ge__(self, other: "Comparable") -> bool: ...
-
-
-K = TypeVar("K", bound=Comparable)  # Key type (must be comparable)
-V = TypeVar("V")  # Value type
-
-
-class TreeMap(Collection, Generic[K, V]):
+class TreeMap(Collection):
     """
     An ordered persistent map implementation for NEAR.
 
@@ -70,16 +48,16 @@ class TreeMap(Collection, Generic[K, V]):
 
         # Vector for storing the sorted keys
         self._keys_prefix = f"{prefix}:keys"
-        self._keys_vector = Vector[K](self._keys_prefix)
+        self._keys_vector = Vector(self._keys_prefix)
 
-    def _find_key_index(self, key: K) -> int:
+    def _find_key_index(self, key: Any) -> int:
         """Find the index where key is or should be inserted"""
         # Simple binary search
         left, right = 0, len(self._keys_vector) - 1
 
         while left <= right:
             mid = (left + right) // 2
-            mid_key = cast(K, self._keys_vector[mid])
+            mid_key = self._keys_vector[mid]
 
             if mid_key == key:
                 return mid
@@ -90,7 +68,7 @@ class TreeMap(Collection, Generic[K, V]):
 
         return left  # This is where the key should be inserted
 
-    def __getitem__(self, key: K) -> V:
+    def __getitem__(self, key: Any) -> Any:
         """
         Get the value for the given key.
 
@@ -112,9 +90,9 @@ class TreeMap(Collection, Generic[K, V]):
         if value is None:
             raise StorageError(f"Missing value for key {key}")
 
-        return cast(V, value)
+        return value
 
-    def __setitem__(self, key: K, value: V) -> None:
+    def __setitem__(self, key: Any, value: Any) -> None:
         """
         Set the value for the given key.
 
@@ -142,7 +120,7 @@ class TreeMap(Collection, Generic[K, V]):
 
             self._set_length(len(self) + 1)
 
-    def __delitem__(self, key: K) -> None:
+    def __delitem__(self, key: Any) -> None:
         """
         Remove the given key.
 
@@ -162,7 +140,7 @@ class TreeMap(Collection, Generic[K, V]):
 
         # Find and remove the key from the keys vector
         index = self._find_key_index(key)
-        if index < len(self._keys_vector) and cast(K, self._keys_vector[index]) == key:
+        if index < len(self._keys_vector) and self._keys_vector[index] == key:
             # Remove the key
             keys = list(self._keys_vector)
             keys.pop(index)
@@ -173,7 +151,7 @@ class TreeMap(Collection, Generic[K, V]):
 
         self._set_length(len(self) - 1)
 
-    def __contains__(self, key: K) -> bool:
+    def __contains__(self, key: Any) -> bool:
         """
         Check if the map contains the given key.
 
@@ -186,7 +164,7 @@ class TreeMap(Collection, Generic[K, V]):
         storage_key = self._make_key(key)
         return near.storage_has_key(storage_key)
 
-    def get(self, key: K, default: Optional[V] = None) -> Optional[V]:
+    def get(self, key: Any, default: Optional[Any] = None) -> Any:
         """
         Get the value for the given key, or default if the key doesn't exist.
 
@@ -202,7 +180,7 @@ class TreeMap(Collection, Generic[K, V]):
         except KeyError:
             return default
 
-    def set(self, key: K, value: V) -> None:
+    def set(self, key: Any, value: Any) -> None:
         """
         Set the value for the given key.
         Alias for __setitem__.
@@ -213,7 +191,7 @@ class TreeMap(Collection, Generic[K, V]):
         """
         self[key] = value
 
-    def remove(self, key: K) -> Optional[V]:
+    def remove(self, key: Any) -> Optional[Any]:
         """
         Remove the given key and return its value.
 
@@ -230,28 +208,28 @@ class TreeMap(Collection, Generic[K, V]):
         except KeyError:
             return None
 
-    def __iter__(self) -> Iterator[K]:
+    def __iter__(self) -> Iterator:
         """Return an iterator over the keys"""
         for i in range(len(self._keys_vector)):
-            yield cast(K, self._keys_vector[i])
+            yield self._keys_vector[i]
 
-    def keys(self) -> List[K]:
+    def keys(self) -> List:
         """Return a list of all keys"""
-        return [cast(K, key) for key in self._keys_vector]
+        return [key for key in self._keys_vector]
 
-    def values(self) -> List[V]:
+    def values(self) -> List:
         """Return a list of all values"""
-        return [self[cast(K, key)] for key in self._keys_vector]
+        return [self[key] for key in self._keys_vector]
 
-    def items(self) -> List[Tuple[K, V]]:
+    def items(self) -> List[Tuple]:
         """Return a list of all (key, value) pairs"""
-        return [(cast(K, key), self[cast(K, key)]) for key in self._keys_vector]
+        return [(key, self[key]) for key in self._keys_vector]
 
     def clear(self) -> None:
         """Remove all elements from the map"""
         # Clear all values
         for key in self._keys_vector:
-            storage_key = self._make_key(cast(K, key))
+            storage_key = self._make_key(key)
             CollectionStorageAdapter.remove(storage_key)
 
         # Clear the keys vector
@@ -260,7 +238,7 @@ class TreeMap(Collection, Generic[K, V]):
         # Reset length
         self._set_length(0)
 
-    def floor_key(self, key: K) -> Optional[K]:
+    def floor_key(self, key: Any) -> Optional[Any]:
         """
         Find the greatest key less than or equal to the given key.
 
@@ -276,16 +254,16 @@ class TreeMap(Collection, Generic[K, V]):
         index = self._find_key_index(key)
 
         # If exact match, return it
-        if index < len(self._keys_vector) and cast(K, self._keys_vector[index]) == key:
-            return cast(K, self._keys_vector[index])
+        if index < len(self._keys_vector) and self._keys_vector[index] == key:
+            return self._keys_vector[index]
 
         # Otherwise, return the key before it
         if index > 0:
-            return cast(K, self._keys_vector[index - 1])
+            return self._keys_vector[index - 1]
 
         return None
 
-    def ceiling_key(self, key: K) -> Optional[K]:
+    def ceiling_key(self, key: Any) -> Optional[Any]:
         """
         Find the least key greater than or equal to the given key.
 
@@ -302,25 +280,25 @@ class TreeMap(Collection, Generic[K, V]):
 
         # If within bounds, return it
         if index < len(self._keys_vector):
-            return cast(K, self._keys_vector[index])
+            return self._keys_vector[index]
 
         return None
 
-    def min_key(self) -> Optional[K]:
+    def min_key(self) -> Optional[Any]:
         """Get the minimum key in the map, or None if empty"""
         if self.is_empty():
             return None
-        return cast(K, self._keys_vector[0])
+        return self._keys_vector[0]
 
-    def max_key(self) -> Optional[K]:
+    def max_key(self) -> Optional[Any]:
         """Get the maximum key in the map, or None if empty"""
         if self.is_empty():
             return None
-        return cast(K, self._keys_vector[len(self._keys_vector) - 1])
+        return self._keys_vector[len(self._keys_vector) - 1]
 
     def range(
-        self, from_key: Optional[K] = None, to_key: Optional[K] = None
-    ) -> List[K]:
+        self, from_key: Optional[Any] = None, to_key: Optional[Any] = None
+    ) -> List:
         """
         Get keys in the given range, inclusive of from_key and exclusive of to_key.
 
@@ -332,7 +310,7 @@ class TreeMap(Collection, Generic[K, V]):
             A list of keys in the range
         """
         # Get all keys
-        all_keys = [cast(K, key) for key in self._keys_vector]
+        all_keys = [key for key in self._keys_vector]
 
         # Find the start and end indices
         start_idx = 0
