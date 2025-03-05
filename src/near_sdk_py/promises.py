@@ -285,6 +285,9 @@ def callback(func: Callable[..., Any]) -> Callable[..., Any]:
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        if near.predecessor_account_id != near.current_account_id:
+            near.panic_utf8("This function is private")
+
         # Get the `input` - these would be extra args passed in to the callback
         if len(kwargs) == 0 and len(args) <= 1:
             try:
