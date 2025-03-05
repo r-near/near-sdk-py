@@ -2,7 +2,7 @@
 Storage adapter for serialization and deserialization of collection values using MessagePack.
 """
 
-from near_sdk_py import umsgpack
+import pickle
 from typing import Any, Optional
 
 import near
@@ -32,24 +32,16 @@ class CollectionStorageAdapter:
         MessagePack automatically handles primitive types, lists, dicts,
         and bytes objects natively.
         """
-        # Use MessagePack to serialize the value
-        try:
-            return umsgpack.dumps(value)
-        except umsgpack.UnsupportedTypeException:
-            # For types not supported by MessagePack, convert to string
-            return umsgpack.dumps(str(value))
+        # Use Pickle to serialize the value
+        return pickle.dumps(value)
 
     @staticmethod
     def deserialize_value(value: bytes) -> Any:
         """
         Deserializes a value from storage using MessagePack.
         """
-        # Decode as MessagePack
-        try:
-            return umsgpack.loads(value)
-        except umsgpack.UnpackException:
-            # If MessagePack decoding fails, return the raw bytes
-            return value
+        # Decode as Pickle
+        return pickle.loads(value)
 
     @staticmethod
     def write(key: str, value: Any) -> None:
