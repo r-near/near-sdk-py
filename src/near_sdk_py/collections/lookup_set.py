@@ -82,7 +82,7 @@ class LookupSet(Collection):
         """
         try:
             self.remove(value)
-        except KeyError:
+        except Exception:
             pass
 
     def clear(self) -> None:

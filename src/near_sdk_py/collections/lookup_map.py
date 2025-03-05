@@ -109,7 +109,7 @@ class LookupMap(Collection):
         """
         try:
             return self[key]
-        except KeyError:
+        except Exception:
             return default
 
     def set(self, key: Any, value: Any) -> None:
@@ -137,7 +137,7 @@ class LookupMap(Collection):
             value = self[key]
             del self[key]
             return value
-        except KeyError:
+        except Exception:
             return None
 
     def clear(self) -> None:

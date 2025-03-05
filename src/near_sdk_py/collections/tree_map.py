@@ -177,7 +177,7 @@ class TreeMap(Collection):
         """
         try:
             return self[key]
-        except KeyError:
+        except Exception:
             return default
 
     def set(self, key: Any, value: Any) -> None:
@@ -205,7 +205,7 @@ class TreeMap(Collection):
             value = self[key]
             del self[key]
             return value
-        except KeyError:
+        except Exception:
             return None
 
     def __iter__(self) -> Iterator:
