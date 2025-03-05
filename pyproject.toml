@@ -18,7 +18,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/near", "src/near_sdk_py", "src/umsgpack"]
+packages = ["src/near", "src/near_sdk_py"]
 
 [tool.semantic_release]
 version_toml = [
