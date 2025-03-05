@@ -1,4 +1,4 @@
-name: Linting and Type Checking
+name: Linting, Type Checking, and Tests
 
 on:
   push:
