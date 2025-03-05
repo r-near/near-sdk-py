@@ -2,7 +2,7 @@
 Storage adapter for serialization and deserialization of collection values using MessagePack.
 """
 
-import umsgpack
+from near_sdk_py import umsgpack
 from typing import Any, Optional
 
 import near

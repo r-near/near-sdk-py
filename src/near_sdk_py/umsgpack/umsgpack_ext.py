@@ -9,7 +9,7 @@
 # The mpext method accepts an instance of a supported class and returns an
 # instance of the appropriate ext_serializable class.
 
-import umsgpack
+from near_sdk_py import umsgpack
 import struct
 
 
