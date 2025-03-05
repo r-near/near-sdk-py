@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## v0.3.0 (2025-03-05)
+
+### Features
+
+- Collections API ([#4](https://github.com/r-near/near-sdk-py/pull/4),
+  [`d462bc4`](https://github.com/r-near/near-sdk-py/commit/d462bc43fed737aa3518ab2ca6f6a2c70be7fa83))
+
+* feat: Collections API
+
+* Strip out generics for micropython
+
+* Switch to msgpack serialization
+
+* Linting
+
+* Move this to inside the SDK
+
+* Fix imports
+
+* Add docs
+
+* Rename this job
+
+* Switch to pickle (it's native)
+
+* Use generic Exception class
+
+
 ## v0.2.0 (2025-03-04)
 
 ### Documentation
