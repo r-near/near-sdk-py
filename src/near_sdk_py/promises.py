@@ -13,6 +13,8 @@ import near
 from .constants import ONE_TGAS
 from .cross_contract import CrossContract
 from .value_return import ValueReturn
+from .input import Input
+from .log import Log
 
 T = TypeVar("T")
 
@@ -234,7 +236,7 @@ class PromiseResult:
 
         try:
             return json.loads(self._data.decode("utf-8"))
-        except Exception as e:
+        except Exception:
             # Return raw data if it can't be parsed as JSON
             return self._data
 
@@ -283,6 +285,18 @@ def callback(func: Callable[..., Any]) -> Callable[..., Any]:
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        # Get the `input` - these would be extra args passed in to the callback
+        if len(kwargs) == 0 and len(args) <= 1:
+            try:
+                # Parse input JSON and use it as kwargs
+                input_json = Input.json()
+                if isinstance(input_json, dict):
+                    kwargs = input_json
+            except Exception as e:
+                # If JSON parsing fails, just log and continue
+                # Your method will need to handle getting input another way
+                Log.warning(f"Failed to parse input as JSON: {e}")
+
         # Get the promise result
         status_code, data = near.promise_result(0)
 
