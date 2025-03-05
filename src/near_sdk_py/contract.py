@@ -23,7 +23,7 @@ class InputError(ContractError):
     pass
 
 
-class Contract:
+class BaseContract:
     """Base class for NEAR smart contracts with higher-level API"""
 
     @staticmethod
