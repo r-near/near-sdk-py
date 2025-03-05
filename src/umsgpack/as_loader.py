@@ -8,12 +8,15 @@
 
 import struct
 import collections
-from . import *
 
-try:
-    from . import umsgpack_ext
-except ImportError:
-    pass
+from . import (
+    ext_type_to_class,
+    Ext,
+    InvalidStringException,
+    UnhashableKeyException,
+    DuplicateKeyException,
+    ReservedCodeException,
+)
 
 
 class aloader:
@@ -79,7 +82,7 @@ class aloader:
         data = await self._re(length)
         try:
             return str(data, "utf-8")  # Preferred MP way to decode
-        except:  # MP does not have UnicodeDecodeError
+        except Exception:  # MP does not have UnicodeDecodeError
             if self.allow_invalid_utf8:
                 return data  # MP Remove InvalidString class: subclass of built-in class
             raise InvalidStringException("unpacked string is invalid utf-8")
@@ -126,7 +129,9 @@ class aloader:
                 return ext_type_to_class[ext_type].unpackb(ext_data)
             except AttributeError:
                 raise NotImplementedError(
-                    "Ext class {:s} lacks unpackb()".format(repr(ext_type_to_class[ext_type]))
+                    "Ext class {:s} lacks unpackb()".format(
+                        repr(ext_type_to_class[ext_type])
+                    )
                 )
 
         return ext
@@ -141,10 +146,10 @@ class aloader:
             length = await self._re0(">I", 4)
         else:
             aloader._fail()
-        l = []
+        data = []
         for i in range(length):
-            l.append(await self._unpack())
-        return tuple(l) if self.use_tuple else l
+            data.append(await self._unpack())
+        return tuple(data) if self.use_tuple else data
 
     @staticmethod
     def _deep_list_to_tuple(obj):
@@ -173,7 +178,7 @@ class aloader:
                 k = aloader._deep_list_to_tuple(k)
             try:
                 hash(k)
-            except:
+            except Exception:
                 raise UnhashableKeyException('unhashable key: "{:s}"'.format(str(k)))
             if k in d:
                 raise DuplicateKeyException(

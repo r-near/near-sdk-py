@@ -12,6 +12,7 @@
 import umsgpack
 import struct
 
+
 # Entries in mpext are required where types are to be handled without declaring
 # an ext_serializable class in the application. This example enables complex,
 # tuple and set types to be packed as if they were native to umsgpack.
@@ -25,6 +26,7 @@ def mpext(obj, options):
     if isinstance(obj, tuple):
         return Tuple(obj)
     return obj
+
 
 @umsgpack.ext_serializable(0x50)
 class Complex:
@@ -41,6 +43,7 @@ class Complex:
     def unpackb(data):
         return complex(*struct.unpack(">ff", data))
 
+
 @umsgpack.ext_serializable(0x51)
 class Set:
     def __init__(self, s):
@@ -55,6 +58,7 @@ class Set:
     @staticmethod
     def unpackb(data):
         return set(umsgpack.loads(data))
+
 
 @umsgpack.ext_serializable(0x52)
 class Tuple:

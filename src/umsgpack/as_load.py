@@ -8,12 +8,14 @@
 
 import struct
 import collections
-from . import *
-
-try:
-    from . import umsgpack_ext
-except ImportError:
-    pass
+from . import (
+    ext_type_to_class,
+    Ext,
+    InvalidStringException,
+    UnhashableKeyException,
+    DuplicateKeyException,
+    ReservedCodeException,
+)
 
 
 def _fail():  # Debug code should never be called.
@@ -73,7 +75,7 @@ async def _unpack_string(code, fp, options):
     data = await _re(fp, length, options)
     try:
         return str(data, "utf-8")  # Preferred MP way to decode
-    except:  # MP does not have UnicodeDecodeError
+    except Exception:  # MP does not have UnicodeDecodeError
         if options.get("allow_invalid_utf8"):
             return data  # MP Remove InvalidString class: subclass of built-in class
         raise InvalidStringException("unpacked string is invalid utf-8")
@@ -123,7 +125,9 @@ async def _unpack_ext(code, fp, options):
             return ext_type_to_class[ext_type].unpackb(ext_data)
         except AttributeError:
             raise NotImplementedError(
-                "Ext class {:s} lacks unpackb()".format(repr(ext_type_to_class[ext_type]))
+                "Ext class {:s} lacks unpackb()".format(
+                    repr(ext_type_to_class[ext_type])
+                )
             )
 
     return ext
@@ -139,10 +143,10 @@ async def _unpack_array(code, fp, options):
         length = await _re0(">I", fp, 4, options)
     else:
         _fail()
-    l = []
+    data = []
     for i in range(length):
-        l.append(await _unpack(fp, options))
-    return tuple(l) if options.get("use_tuple") else l
+        data.append(await _unpack(fp, options))
+    return tuple(data) if options.get("use_tuple") else data
 
 
 def _deep_list_to_tuple(obj):
@@ -172,7 +176,7 @@ async def _unpack_map(code, fp, options):
             k = _deep_list_to_tuple(k)
         try:
             hash(k)
-        except:
+        except Exception:
             raise UnhashableKeyException('unhashable key: "{:s}"'.format(str(k)))
         if k in d:
             raise DuplicateKeyException(

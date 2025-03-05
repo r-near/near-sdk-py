@@ -33,6 +33,7 @@ __version__ = (0, 1, 3)
 # Ext Class
 ##############################################################################
 
+
 # Extension type for application-defined types and data
 class Ext:
     """
@@ -68,10 +69,12 @@ class Ext:
         if not isinstance(type, int):
             raise TypeError("ext type is not type integer")
         if not (-128 <= type <= 127):
-            raise ValueError("ext type value {:d} is out of range (-128 to 127)".format(type))
+            raise ValueError(
+                "ext type value {:d} is out of range (-128 to 127)".format(type)
+            )
         # Check data is type bytes
         elif not isinstance(data, bytes):
-            raise TypeError("ext data is not type \'bytes\'")
+            raise TypeError("ext data is not type 'bytes'")
         self.type = type
         self.data = data
 
@@ -79,9 +82,11 @@ class Ext:
         """
         Compare this Ext object with another for equality.
         """
-        return (isinstance(other, self.__class__) and
-                self.type == other.type and
-                self.data == other.data)
+        return (
+            isinstance(other, self.__class__)
+            and self.type == other.type
+            and self.data == other.data
+        )
 
     def __ne__(self, other):
         """
@@ -94,8 +99,12 @@ class Ext:
         String representation of this Ext object.
         """
         s = "Ext Object (Type: {:d}, Data: ".format(self.type)
-        s += " ".join(["0x{:02}".format(ord(self.data[i:i + 1]))
-                       for i in xrange(min(len(self.data), 8))])
+        s += " ".join(
+            [
+                "0x{:02}".format(ord(self.data[i : i + 1]))
+                for i in range(min(len(self.data), 8))
+            ]
+        )
         if len(self.data) > 8:
             s += " ..."
         s += ")"
@@ -112,8 +121,8 @@ class Ext:
 # Ext Serializable Decorator
 ##############################################################################
 
-ext_class_to_type = {}
-ext_type_to_class = {}
+ext_class_to_type: dict = {}
+ext_type_to_class: dict = {}
 
 
 def ext_serializable(ext_type):
@@ -133,15 +142,26 @@ def ext_serializable(ext_type):
         ValueError:
             Ext type or class already registered.
     """
+
     def wrapper(cls):
         if not isinstance(ext_type, int):
             raise TypeError("Ext type is not type integer")
         elif not (-128 <= ext_type <= 127):
-            raise ValueError("Ext type value {:d} is out of range of -128 to 127".format(ext_type))
+            raise ValueError(
+                "Ext type value {:d} is out of range of -128 to 127".format(ext_type)
+            )
         elif ext_type in ext_type_to_class:
-            raise ValueError("Ext type {:d} already registered with class {:s}".format(ext_type, repr(ext_type_to_class[ext_type])))
+            raise ValueError(
+                "Ext type {:d} already registered with class {:s}".format(
+                    ext_type, repr(ext_type_to_class[ext_type])
+                )
+            )
         elif cls in ext_class_to_type:
-            raise ValueError("Class {:s} already registered with Ext type {:d}".format(repr(cls), ext_type))
+            raise ValueError(
+                "Class {:s} already registered with Ext type {:d}".format(
+                    repr(cls), ext_type
+                )
+            )
 
         ext_type_to_class[ext_type] = cls
         ext_class_to_type[cls] = ext_type
@@ -154,6 +174,7 @@ def ext_serializable(ext_type):
 ##############################################################################
 # Exceptions
 ##############################################################################
+
 
 # Base Exception classes
 class PackException(Exception):
@@ -188,6 +209,7 @@ class UnhashableKeyException(UnpackException):
     The serialized map cannot be deserialized into a Python dictionary.
     """
 
+
 class DuplicateKeyException(UnpackException):
     "Duplicate key encountered during map unpacking."
 
@@ -195,6 +217,7 @@ class DuplicateKeyException(UnpackException):
 ##############################################################################
 # Lazy module load to save RAM: takes about 20μs on Pyboard 1.x after initial load
 ##############################################################################
+
 
 def load(fp, **options):
     """
@@ -237,7 +260,9 @@ def load(fp, **options):
     >>>
     """
     from . import mp_load
+
     return mp_load.load(fp, options)
+
 
 def loads(s, **options):
     """
@@ -281,7 +306,9 @@ def loads(s, **options):
     >>>
     """
     from . import mp_load
+
     return mp_load.loads(s, options)
+
 
 def dump(obj, fp, **options):
     """
@@ -313,7 +340,9 @@ def dump(obj, fp, **options):
     >>>
     """
     from . import mp_dump
+
     mp_dump.dump(obj, fp, options)
+
 
 def dumps(obj, **options):
     """
@@ -344,7 +373,9 @@ def dumps(obj, **options):
     >>>
     """
     from . import mp_dump
+
     return mp_dump.dumps(obj, options)
+
 
 async def aload(fp, **options):
     """
@@ -389,7 +420,9 @@ async def aload(fp, **options):
     >>>
     """
     from . import as_load
+
     return await as_load.aload(fp, options)
+
 
 def aloader(fp, **options):
     """
@@ -409,4 +442,5 @@ def aloader(fp, **options):
     >>>
     """
     from . import as_loader
+
     return as_loader.aloader(fp, options)
