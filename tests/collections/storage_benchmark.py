@@ -5,10 +5,9 @@ This script measures storage units used by different collection operations,
 which directly corresponds to gas costs in NEAR smart contracts.
 """
 
-import pytest
 from rich.console import Console
 from rich.table import Table
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Tuple
 
 # Import collections
 from near_sdk_py.collections.vector import Vector

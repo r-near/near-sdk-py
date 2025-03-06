@@ -2,7 +2,7 @@
 UnorderedMap collection for NEAR smart contracts.
 """
 
-from typing import Any, Iterator, List, Tuple  # Keep typing for docs
+from typing import Any, Iterator, Tuple  # Keep typing for docs
 
 import near
 
