@@ -1,0 +1,17 @@
+{
+	"name": "integration_tests",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "vitest --hookTimeout=180000 --testTimeout=180000"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"near-workspaces": "^4.0.0",
+		"tsx": "^4.19.3",
+		"vitest": "^3.0.8"
+	}
+}

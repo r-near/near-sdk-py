@@ -1,0 +1,23 @@
+version = 1
+revision = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "collections"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "near-sdk-py" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "near-sdk-py" }]
+
+[[package]]
+name = "near-sdk-py"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/da/9f92bbcba52e75ab9540e87f44273dfc5ba7c67bb065156030297463dda9/near_sdk_py-0.3.0.tar.gz", hash = "sha256:d847a810f262f8ddd19bde06048bc158a48b293fcaef08efd3b9f3489709fa5d", size = 50416 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/5d/7f6a8bc8c690b1f9a9b073fdc9c52cdf0f91c5cac4db2e57a8b883d7365d/near_sdk_py-0.3.0-py3-none-any.whl", hash = "sha256:68c83cbe82f7fb453c5467a750c2f0eb80645545ef9a47c7baaa7e7202b1229b", size = 32524 },
+]
