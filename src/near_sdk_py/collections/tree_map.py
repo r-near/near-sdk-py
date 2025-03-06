@@ -1,8 +1,8 @@
 """
-TreeMap collection for NEAR smart contracts.
+Optimized TreeMap collection for NEAR smart contracts.
 """
 
-from typing import Any, Iterator, List, Optional, Tuple  # Keep typing for docs
+from typing import Any, Iterator, List, Optional, Tuple
 
 import near
 from near_sdk_py.contract import StorageError
@@ -110,15 +110,42 @@ class TreeMap(Collection):
         if not exists:
             index = self._find_key_index(key)
 
-            # Insert the key at the correct position
-            keys = list(self._keys_vector)
-            keys.insert(index, key)
-
-            # Update the keys vector
-            self._keys_vector.clear()
-            self._keys_vector.extend(keys)
+            # OPTIMIZED: Insert at specific index instead of rebuilding the entire vector
+            # This avoids the O(n²) operation in the original implementation
+            self._insert_at_index(index, key)
 
             self._set_length(len(self) + 1)
+
+    def _insert_at_index(self, index: int, key: Any) -> None:
+        """
+        Insert a key at a specific index in the keys vector.
+
+        This method shifts all elements after the index one position to the right
+        and inserts the new key at the given index.
+
+        Args:
+            index: The index to insert at
+            key: The key to insert
+        """
+        vector_length = len(self._keys_vector)
+
+        # Append to the end if inserting at the end
+        if index >= vector_length:
+            self._keys_vector.append(key)
+            return
+
+        # Shift elements to make room
+        # Start by appending a placeholder at the end
+        self._keys_vector.append(
+            None
+        )  # Doesn't matter what we append, it will be overwritten
+
+        # Shift elements from right to left, starting from the end
+        for i in range(vector_length, index, -1):
+            self._keys_vector[i] = self._keys_vector[i - 1]
+
+        # Insert the new key
+        self._keys_vector[index] = key
 
     def __delitem__(self, key: Any) -> None:
         """
@@ -141,15 +168,32 @@ class TreeMap(Collection):
         # Find and remove the key from the keys vector
         index = self._find_key_index(key)
         if index < len(self._keys_vector) and self._keys_vector[index] == key:
-            # Remove the key
-            keys = list(self._keys_vector)
-            keys.pop(index)
-
-            # Update the keys vector
-            self._keys_vector.clear()
-            self._keys_vector.extend(keys)
+            # OPTIMIZED: Remove at specific index without rebuilding the entire vector
+            self._remove_at_index(index)
 
         self._set_length(len(self) - 1)
+
+    def _remove_at_index(self, index: int) -> None:
+        """
+        Remove a key at a specific index in the keys vector.
+
+        This method shifts all elements after the index one position to the left.
+
+        Args:
+            index: The index to remove at
+        """
+        vector_length = len(self._keys_vector)
+
+        # Check bounds
+        if index >= vector_length:
+            return
+
+        # Shift elements to close the gap
+        for i in range(index, vector_length - 1):
+            self._keys_vector[i] = self._keys_vector[i + 1]
+
+        # Remove the last element (now duplicated)
+        self._keys_vector.pop()
 
     def __contains__(self, key: Any) -> bool:
         """
