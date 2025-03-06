@@ -27,9 +27,12 @@ jobs:
           enable-cache: true
 
       - name: Create release
+        id: semantic_release
+        continue-on-error: true
         run: uvx python-semantic-release -vv version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to PyPI
+        if: steps.semantic_release.outcome == 'success'
         run: uv publish --trusted-publishing always
