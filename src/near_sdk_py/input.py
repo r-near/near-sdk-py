@@ -27,5 +27,5 @@ class Input:
         """Gets the input as parsed JSON"""
         try:
             return json.loads(Input.string())
-        except json.JSONDecodeError as e:
+        except Exception as e:
             raise InputError(f"Failed to decode JSON input: {e}")

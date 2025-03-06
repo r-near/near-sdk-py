@@ -218,13 +218,13 @@ See the [Promises API documentation](docs/promises-api.md) for more detailed exa
 # Require exactly 1 yoctoNEAR to prove key ownership
 @call
 def transfer_ownership(self, new_owner):
-    Contract.assert_one_yocto()  # Ensures tx is signed (non-delegated)
+    BaseContract.assert_one_yocto()  # Ensures tx is signed (non-delegated)
     # Implementation...
 
 # Require minimum deposit for a function
 @call
 def place_bid(self, token_id):
-    Contract.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
+    BaseContract.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
     # Implementation...
 ```
 

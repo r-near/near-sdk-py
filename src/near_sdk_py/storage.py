@@ -32,7 +32,7 @@ class Storage:
         if value is not None:
             try:
                 return json.loads(value)
-            except json.JSONDecodeError as e:
+            except Exception as e:
                 raise StorageError(f"Failed to decode JSON for key {key}: {e}")
         return None
 
