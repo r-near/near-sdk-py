@@ -1,7 +1,20 @@
 # CHANGELOG
 
 
+## v0.4.1 (2025-03-06)
+
+### Bug Fixes
+
+- **ci**: Improve release process
+  ([`f7fd392`](https://github.com/r-near/near-sdk-py/commit/f7fd3923102acbf3394177143de3846617269d30))
+
+
 ## v0.4.0 (2025-03-06)
+
+### Chores
+
+- **release**: 0.4.0
+  ([`3913f58`](https://github.com/r-near/near-sdk-py/commit/3913f584b80662ec9f6601ab87e8a38d7b718e3b))
 
 ### Documentation
 
@@ -15,6 +28,11 @@
 
 
 ## v0.3.0 (2025-03-05)
+
+### Chores
+
+- **release**: 0.3.0
+  ([`c72f1eb`](https://github.com/r-near/near-sdk-py/commit/c72f1ebb2afd8ada616e7826e1f66936d4cd5f03))
 
 ### Features
 
@@ -43,6 +61,11 @@
 
 
 ## v0.2.0 (2025-03-04)
+
+### Chores
+
+- **release**: 0.2.0
+  ([`204dbb8`](https://github.com/r-near/near-sdk-py/commit/204dbb8f468562ed8c0b7c3b1e6e8f5a223d0383))
 
 ### Documentation
 
@@ -90,6 +113,9 @@
 
 - Update permissions
   ([`0e9b3ae`](https://github.com/r-near/near-sdk-py/commit/0e9b3aee307aababe8db3ba2c61c7c661516f390))
+
+- **release**: 0.1.2
+  ([`9667445`](https://github.com/r-near/near-sdk-py/commit/96674452eef1cb6628c8f35d4a6ee8d6def8d8ab))
 
 
 ## v0.1.1 (2025-03-03)

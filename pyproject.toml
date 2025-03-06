@@ -1,6 +1,6 @@
 [project]
 name = "near-sdk-py"
-version = "0.4.0"
+version = "0.4.1"
 description = "A higher-level API for building NEAR smart contracts in Python."
 readme = "README.md"
 requires-python = ">=3.9"
