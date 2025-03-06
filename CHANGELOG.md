@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.4.0 (2025-03-06)
+
+### Documentation
+
+- Add more info about Collections
+  ([`cecd424`](https://github.com/r-near/near-sdk-py/commit/cecd424a4e77d8088547a700ba3fcbb7260ba00c))
+
+### Features
+
+- Support more versions of Python ([#9](https://github.com/r-near/near-sdk-py/pull/9),
+  [`169a3cd`](https://github.com/r-near/near-sdk-py/commit/169a3cd9fa4812d8cf9c7104a39215d6006c8ec2))
+
+
 ## v0.3.0 (2025-03-05)
 
 ### Features
