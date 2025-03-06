@@ -82,9 +82,9 @@ class UnorderedSet(LookupSet):
         """Return an iterator over the values"""
         return iter(self._values_vector)
 
-    def values(self) -> List:
-        """Return a list of all values"""
-        return list(self._values_vector)
+    def values(self) -> Iterator[Any]:
+        """Return an iterator over the values"""
+        return iter(self._values_vector)
 
     def clear(self) -> None:
         """Remove all values from the set"""

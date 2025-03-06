@@ -84,17 +84,19 @@ class UnorderedMap(LookupMap):
         """Return an iterator over the keys"""
         return iter(self._keys_vector)
 
-    def keys(self) -> List:
-        """Return a list of all keys"""
-        return list(self._keys_vector)
+    def keys(self) -> Iterator[Any]:
+        """Return an iterator over the keys"""
+        return iter(self._keys_vector)
 
-    def values(self) -> List:
-        """Return a list of all values"""
-        return [self[key] for key in self._keys_vector]
+    def values(self) -> Iterator[Any]:
+        """Return an iterator over the values"""
+        for key in self._keys_vector:
+            yield self[key]
 
-    def items(self) -> List[Tuple]:
-        """Return a list of all (key, value) pairs"""
-        return [(key, self[key]) for key in self._keys_vector]
+    def items(self) -> Iterator[Tuple[Any, Any]]:
+        """Return an iterator over the (key, value) pairs"""
+        for key in self._keys_vector:
+            yield (key, self[key])
 
     def clear(self) -> None:
         """Remove all elements from the map"""
