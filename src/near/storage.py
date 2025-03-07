@@ -72,16 +72,17 @@ def storage_has_key(key: Union[bytes, str]) -> bool:
     """
     return False
 
+
 def storage_iter_prefix(prefix: Union[bytes, str]) -> int:
     """
     Creates a storage iterator for keys with the given prefix.
-    
+
     Args:
         prefix: The key prefix to iterate over
-        
+
     Returns:
         An iterator ID that can be used with storage_iter_next
-        
+
     Note:
         This is a mock function in the local environment and will return 0.
     """
@@ -91,14 +92,14 @@ def storage_iter_prefix(prefix: Union[bytes, str]) -> int:
 def storage_iter_range(start: Union[bytes, str], end: Union[bytes, str]) -> int:
     """
     Creates a storage iterator for keys in the given range.
-    
+
     Args:
         start: The start key (inclusive)
         end: The end key (exclusive)
-        
+
     Returns:
         An iterator ID that can be used with storage_iter_next
-        
+
     Note:
         This is a mock function in the local environment and will return 0.
     """
@@ -108,13 +109,13 @@ def storage_iter_range(start: Union[bytes, str], end: Union[bytes, str]) -> int:
 def storage_iter_next(iterator_id: int) -> Tuple[bool, bytes, bytes]:
     """
     Gets the next key-value pair from a storage iterator.
-    
+
     Args:
         iterator_id: The ID of the storage iterator
-        
+
     Returns:
         A tuple of (valid, key, value), where valid is True if there was a next item
-        
+
     Note:
         This is a mock function in the local environment and will return (False, b"", b"").
     """

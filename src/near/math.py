@@ -122,19 +122,20 @@ def ed25519_verify(sig: bytes, msg: bytes, pub_key: bytes) -> bool:
     """
     return False
 
+
 def alt_bn128_g1_multiexp(value: bytes) -> bytes:
     """
     Performs multi-exponentiation on the Alt BN128 G1 curve.
-    
+
     This is used for efficient computation of multiple exponentiations, which is
     a common operation in zero-knowledge proofs.
-    
+
     Args:
         value: Input for the operation, which should be formatted as a series of points and scalars
-        
+
     Returns:
         The resulting G1 point
-        
+
     Note:
         This is a mock function in the local environment and will return empty bytes.
     """
@@ -144,15 +145,15 @@ def alt_bn128_g1_multiexp(value: bytes) -> bytes:
 def alt_bn128_g1_sum(value: bytes) -> bytes:
     """
     Performs point addition on the Alt BN128 G1 curve.
-    
+
     This adds multiple G1 points together.
-    
+
     Args:
         value: Input for the operation, which should be formatted as a series of G1 points
-        
+
     Returns:
         The resulting G1 point from adding all input points
-        
+
     Note:
         This is a mock function in the local environment and will return empty bytes.
     """
@@ -162,16 +163,16 @@ def alt_bn128_g1_sum(value: bytes) -> bytes:
 def alt_bn128_pairing_check(value: bytes) -> bool:
     """
     Performs a pairing check on the Alt BN128 curve.
-    
+
     This checks if the product of pairings equals 1, which is used for verifying
     zero-knowledge proofs and other cryptographic protocols.
-    
+
     Args:
         value: Input for the operation, which should be formatted as a series of G1 and G2 points
-        
+
     Returns:
         True if the pairing check passes, False otherwise
-        
+
     Note:
         This is a mock function in the local environment and will return False.
     """
