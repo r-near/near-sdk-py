@@ -47,6 +47,9 @@ jobs:
             version: ${{env.EM_VERSION}}
             actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
 
+      - name: Install dependencies
+        run: uv sync
+
       - name: Install self into venv
         run: uv pip install .
 
