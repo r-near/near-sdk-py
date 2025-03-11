@@ -5,7 +5,7 @@ description = "A higher-level API for building NEAR smart contracts in Python."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "near-pytest>=0.4.1",
+    "near-pytest>=0.4.2",
 ]
 
 [build-system]
