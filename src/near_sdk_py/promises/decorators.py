@@ -72,3 +72,68 @@ def callback(func: Callable[..., Any]) -> Callable[..., Any]:
 
     # Export the wrapped function
     return near.export(wrapper)
+
+
+def multi_callback(func: Callable[..., Any]) -> Callable[..., Any]:
+    """
+    Decorator for handling multiple promise results when using Promise.join or Promise.all.
+
+    This decorator:
+    1. Registers the function as a multi-promise callback
+    2. Collects all available promise results
+    3. Passes them to your function as a list of PromiseResult objects
+
+    Example:
+        @multi_callback
+        def on_multiple_results(self, results, extra_arg=None):
+            # Process the list of PromiseResult objects
+            return processed_data
+    """
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        # Get the number of promise results
+        results_count = near.promise_results_count()
+
+        # Collect all results
+        promise_results = []
+        for i in range(results_count):
+            status_code, data = near.promise_result(i)
+
+            # Try to parse JSON data if it looks like JSON
+            parsed_data = data
+            try:
+                if data:
+                    parsed_data = json.loads(data)
+            except Exception:
+                # If parsing fails, keep the original data
+                pass
+
+            # Add the result to our collection
+            promise_results.append(PromiseResult(status_code, parsed_data))
+
+        # Parse input arguments
+        try:
+            input_kwargs = Input.json()
+            if isinstance(input_kwargs, dict):
+                kwargs.update(input_kwargs)
+        except Exception:
+            # If JSON parsing fails, continue with existing kwargs
+            pass
+
+        # Call the wrapped function with the collected results
+        final_result = func(self, promise_results, *args, **kwargs)
+
+        # Handle the return value
+        if final_result is not None:
+            if isinstance(final_result, bytes):
+                ValueReturn.bytes(final_result)
+            elif isinstance(final_result, str):
+                ValueReturn.string(final_result)
+            else:
+                ValueReturn.json(final_result)
+
+        return final_result
+
+    # Export the wrapped function
+    return near.export(wrapper)

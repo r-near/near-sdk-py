@@ -529,7 +529,7 @@ wheels = [
 
 [[package]]
 name = "near-pytest"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "base58" },
@@ -539,9 +539,9 @@ dependencies = [
     { name = "pytest" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dc/fa/cfa7f3e299f0986471eec9ffd5c850bc8056b9abf12bf552666f2ded6b56/near_pytest-0.5.0.tar.gz", hash = "sha256:61e5f6e3c81f226b3edada21e608a69071da3a0855644cb09fc24823ed5aa71f", size = 65080 }
+sdist = { url = "https://files.pythonhosted.org/packages/44/e2/61fc5e34a2295d51b9d5a62c3fc027ff707db4818adf2f6be75c226f615f/near_pytest-0.5.1.tar.gz", hash = "sha256:723f32622da29dc6fbd6de13a16f74adfab058002f99f6c9b4e1b8ad0783c633", size = 65138 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/9b/9c0393f2e57c4e2df971761ba5bbc8fea9e4abf883881b33f95587135573/near_pytest-0.5.0-py3-none-any.whl", hash = "sha256:1629ae02b5267d901789da4759dfd0fcf462c1effc88558362a2d24dbaf88394", size = 16879 },
+    { url = "https://files.pythonhosted.org/packages/7d/d7/d6b85939626ee9969f149c8fb7acc103ca9184c3fdcd4ebec63ac8130d84/near_pytest-0.5.1-py3-none-any.whl", hash = "sha256:0399bfef06313e455a8ca05a253c3e78b84f5dae1869e6bedf8be11c1bbbc966", size = 16877 },
 ]
 
 [[package]]
@@ -564,7 +564,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
-    { name = "near-pytest", specifier = ">=0.5.0" },
+    { name = "near-pytest", specifier = ">=0.5.1" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
@@ -573,7 +573,7 @@ dev = [
 
 [[package]]
 name = "nearc"
-version = "0.7.0"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "near-abi-py" },
@@ -585,9 +585,9 @@ dependencies = [
     { name = "types-zstd" },
     { name = "zstd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/11/b4/b07aef415ea97cb24fda13b3c9e2264abb6c140136d68259c355c2bbe714/nearc-0.7.0.tar.gz", hash = "sha256:b5c592358e1da3a8b0fbbf9866aa525e291f6d15ea2bcd07e02c81c9504b43f9", size = 8355498 }
+sdist = { url = "https://files.pythonhosted.org/packages/94/5a/02336eb836efd04a74fc084a6236f5e636c7ef6726408a581d19f4a4f077/nearc-0.7.1.tar.gz", hash = "sha256:c65b86a3c8d7124e22137fe81a295d0f7ae5d192d577d7efe7927caa78e4e978", size = 8355494 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/c6/0e319aab8a6463c1739201c3e228b41c3c9f4344b623a90cd6a178f87585/nearc-0.7.0-py3-none-any.whl", hash = "sha256:871d47c066ca5f540cd0f3c403a353eeb561b933116dab60314a19996cd4ee2b", size = 11593759 },
+    { url = "https://files.pythonhosted.org/packages/c0/cf/b53b1d039fd40cc9fe3d5c8a9bdcf08b50ef6784d5bc4151b2f5d95f5f44/nearc-0.7.1-py3-none-any.whl", hash = "sha256:6f3a40d024fa0adbcbc3f9489d276ed30446c5f78bf5cc4b494c168744bcd49b", size = 11593780 },
 ]
 
 [[package]]

@@ -117,3 +117,37 @@ class TestPromisesAPI(NearTestCase):
         assert response["key"] == "callback_key"
         assert response["value"] == "callback_value"
         assert response["processed"] is True
+
+    def test_promise_join(self):
+        """Test joining multiple promises and executing a callback."""
+        # First set values in both contracts to test joining promises
+        self.instance1.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "join_key1", "value": "join_value1"},
+        )
+
+        self.instance2.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "join_key2", "value": "join_value2"},
+        )
+
+        result = self.instance1.call_as(
+            account=self.alice,
+            method_name="join_promises",
+            args={
+                "contract_id1": self.instance1.account_id,
+                "contract_id2": self.instance2.account_id,
+                "key1": "join_key1",
+                "key2": "join_key2",
+            },
+            gas=300 * 10**12,  # Allocate more gas for multiple promises
+        )
+
+        # Parse the JSON result
+        response = json.loads(result)
+
+        # Verify that both values were retrieved and combined
+        assert response["success"] is True
+        assert response["values"] == ["join_value1", "join_value2"]
