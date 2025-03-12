@@ -4,9 +4,7 @@ version = "0.4.1"
 description = "A higher-level API for building NEAR smart contracts in Python."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "near-pytest>=0.4.2",
-]
+dependencies = []
 
 [build-system]
 requires = ["hatchling"]
@@ -15,9 +13,10 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
-    "near-pytest>=0.4.2",
+    "near-pytest>=0.5.0",
     "pytest>=8.3.5",
     "pytest-benchmark>=5.1.0",
+    "pytest-xdist>=3.6.1",
     "rich>=13.9.4",
     "ruff>=0.9.9",
 ]
