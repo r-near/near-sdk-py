@@ -5,8 +5,7 @@ This module provides a more intuitive, Pythonic interface for NEAR's
 cross-contract calls with method chaining and modern Python syntax.
 """
 
-import json
-from typing import Any, List, Union, TypeVar
+from typing import List, TypeVar
 
 import near
 from near_sdk_py.constants import ONE_TGAS
@@ -14,6 +13,7 @@ from near_sdk_py.cross_contract import CrossContract
 from .batch import PromiseBatch
 
 T = TypeVar("T")
+STATUS_NAMES = ["NotReady", "Successful", "Failed"]
 
 
 class Promise:
@@ -175,69 +175,24 @@ class Promise:
 
 
 class PromiseResult:
-    """Wrapper for cross-contract call results with error handling."""
+    """Minimal wrapper for cross-contract call results."""
 
-    def __init__(self, promise_result: dict):
-        """
-        Initialize from a raw promise result.
+    def __init__(self, status_code, data):
+        self.status_code = status_code
+        self.data = data
+        self.success = status_code == 1
 
-        Args:
-            promise_result: The raw promise result from CrossContract.get_result()
-        """
-        self.raw_result = promise_result
-        self.status = promise_result.get("status", "Unknown")
-        self.status_code = promise_result.get("status_code", 0)
-        self._data = promise_result.get("data", None)
-
-    @property
-    def is_success(self) -> bool:
-        """Whether the promise completed successfully."""
-        return self.status == "Successful"
-
-    @property
-    def is_error(self) -> bool:
-        """Whether the promise completed with an error."""
-        return self.status == "Failed"
-
-    @property
-    def data(self) -> Any:
-        """
-        Get deserialized data from the result.
-
-        Returns:
-            The parsed JSON data, or raw data if not JSON
-        """
-        if not self._data:
-            return None
-
-        try:
-            return json.loads(self._data.decode("utf-8"))
-        except (json.JSONDecodeError, UnicodeDecodeError):
-            # Return raw data if it can't be parsed as JSON
-            return self._data
-
-    def unwrap(self) -> Any:
-        """
-        Get the data or raise an exception if failed.
-
-        Returns:
-            The parsed result data
-
-        Raises:
-            Exception: If the promise failed or is not ready
-        """
-        if not self.is_success:
-            raise Exception(f"Promise failed with status: {self.status}")
+    def unwrap(self):
+        """Get data or raise exception if failed."""
+        if not self.success:
+            status_name = (
+                STATUS_NAMES[self.status_code]
+                if 0 <= self.status_code <= 2
+                else "Unknown"
+            )
+            raise Exception(f"Promise failed with status: {status_name}")
         return self.data
 
-    def unwrap_or(self, default: T) -> Union[Any, T]:
-        """
-        Get the data or return a default value if failed.
-
-        Args:
-            default: Value to return if the promise failed
-
-        Returns:
-            The parsed data or the default value
-        """
-        return self.data if self.is_success else default
+    def unwrap_or(self, default):
+        """Get data or return default if failed."""
+        return self.data if self.success else default

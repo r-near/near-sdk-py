@@ -8,9 +8,16 @@ cross-contract calls with method chaining and modern Python syntax.
 from typing import Any, Callable
 from functools import wraps
 
+import json
 import near
 from near_sdk_py.value_return import ValueReturn
 from .promise import PromiseResult
+from near_sdk_py.input import Input
+
+STATUS_NOT_READY = 0
+STATUS_SUCCESSFUL = 1
+STATUS_FAILED = 2
+STATUS_NAMES = ["NotReady", "Successful", "Failed"]
 
 
 def callback(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -34,28 +41,23 @@ def callback(func: Callable[..., Any]) -> Callable[..., Any]:
         # Get the promise result
         status_code, data = near.promise_result(0)
 
-        # Create a result object
-        promise_result = {
-            "status_code": status_code,
-            "status": ["NotReady", "Successful", "Failed"][status_code]
-            if 0 <= status_code <= 2
-            else "Unknown",
-            "data": data,
-        }
+        # Parse the data as JSON
+        try:
+            data = json.loads(data)
+        except Exception:
+            pass
 
-        # Convert to PromiseResult for easier handling
-        result = PromiseResult(promise_result)
+        promise_result = PromiseResult(status_code, data)
 
-        # Check if successful
-        if not result.is_success:
-            # Default error handling
-            final_result = {"error": f"Call failed: {result.status}"}
-        else:
-            # Call the handler with parsed data
-            try:
-                final_result = func(self, result.data, *args, **kwargs)
-            except Exception as e:
-                final_result = {"error": f"Error processing result: {str(e)}"}
+        # Check if we have any args as well
+        kwargs = {}
+        try:
+            kwargs = Input.json()
+        except Exception:
+            pass
+
+        # Call the wrapped function with simplified parameters
+        final_result = func(self, promise_result, *args, **kwargs)
 
         # Handle the return value
         if final_result is not None:

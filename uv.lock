@@ -546,6 +546,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "mypy" },
+    { name = "near-pytest" },
     { name = "pytest" },
     { name = "pytest-benchmark" },
     { name = "rich" },
@@ -558,6 +559,7 @@ requires-dist = [{ name = "near-pytest", specifier = ">=0.4.2" }]
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
+    { name = "near-pytest", specifier = ">=0.4.2" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-benchmark", specifier = ">=5.1.0" },
     { name = "rich", specifier = ">=13.9.4" },
