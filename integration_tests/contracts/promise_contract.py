@@ -210,6 +210,60 @@ class MinimalPromiseContract:
                 "handled": True,
             }
 
+    @call
+    def execute_batch(
+        self,
+        self_key: str,
+        self_value: str,
+        other_contract_id: str,
+        other_key: str,
+        other_value: str,
+    ):
+        """Execute multiple operations as a batch.
+
+        This demonstrates using Promise.batch to perform multiple operations atomically.
+        """
+        near.log_utf8("Starting batch execution")
+
+        # First, update our own state directly
+        Storage.set(self_key, self_value)
+
+        # Create a batch for the other contract
+        contract2 = Contract(other_contract_id)
+        batch = contract2.batch()
+
+        # Add operations to the batch
+        batch.function_call(
+            "set_value", {"key": other_key, "value": other_value}, gas=50 * ONE_TGAS
+        )
+
+        # Add a callback to handle completion
+        promise = batch.then("contract1.test.near").function_call(
+            "batch_callback",
+            {"self_key": self_key, "other_key": other_key},
+            gas=50 * ONE_TGAS,
+        )
+
+        return promise.value()
+
+    @callback
+    def batch_callback(self, result: PromiseResult, self_key: str, other_key: str):
+        """Handle completion of the batch operations."""
+        near.log_utf8(f"Batch callback: success={result.success}")
+
+        if not result.success:
+            return {
+                "success": False,
+                "error": f"Batch execution failed: status_code={result.status_code}",
+            }
+
+        # Return success with info about what was updated
+        return {
+            "success": True,
+            "message": "Batch operations completed successfully",
+            "updated_keys": [self_key, other_key],
+        }
+
 
 # Create an instance and export the methods
 contract = MinimalPromiseContract()
@@ -228,3 +282,5 @@ process_first_call = contract.process_first_call
 process_second_call = contract.process_second_call
 call_nonexistent_method = contract.call_nonexistent_method
 handle_error = contract.handle_error
+execute_batch = contract.execute_batch
+batch_callback = contract.batch_callback

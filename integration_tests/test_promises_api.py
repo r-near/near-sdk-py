@@ -224,3 +224,51 @@ class TestPromisesAPI(NearTestCase):
             args={"key": "error_key"},
         )
         assert check_value == "original_value"
+
+    def test_promise_batch_operations(self):
+        """Test batch operations using the Promise API."""
+        # First, set an initial value
+        self.instance1.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "batch_key", "value": "initial_value"},
+        )
+
+        # Now call a method that uses batch operations to:
+        # 1. Set a value on the contract itself
+        # 2. Call another contract
+        # All in a single atomic operation
+        result = self.instance1.call_as(
+            account=self.alice,
+            method_name="execute_batch",
+            args={
+                "self_key": "batch_key",
+                "self_value": "updated_value",
+                "other_contract_id": self.instance2.account_id,
+                "other_key": "remote_batch_key",
+                "other_value": "remote_value",
+            },
+            gas=300 * 10**12,  # Allocate plenty of gas
+        )
+
+        # Parse the JSON result
+        response = json.loads(result)
+
+        # Verify the batch operation succeeded
+        assert response["success"] is True
+
+        # Verify the local value was updated
+        local_value = self.instance1.call_as(
+            account=self.alice,
+            method_name="get_value",
+            args={"key": "batch_key"},
+        )
+        assert local_value == "updated_value"
+
+        # Verify the remote value was set
+        remote_value = self.instance2.call_as(
+            account=self.alice,
+            method_name="get_value",
+            args={"key": "remote_batch_key"},
+        )
+        assert remote_value == "remote_value"

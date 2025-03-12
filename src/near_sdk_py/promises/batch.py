@@ -204,3 +204,14 @@ class PromiseBatch:
         """
         promise_id = near.promise_batch_then(self._promise_id, account_id)
         return PromiseBatch(promise_id, self._gas)
+
+    def value(self):
+        """
+        Return this batch's result to the caller.
+
+        This should be the final operation in your batch chain.
+        Similar to Promise.value(), this tells the NEAR VM to return
+        the result of this promise to the caller.
+        """
+        near.promise_return(self._promise_id)
+        return None  # The actual return happens asynchronously
