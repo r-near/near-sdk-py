@@ -264,6 +264,77 @@ class MinimalPromiseContract:
             "updated_keys": [self_key, other_key],
         }
 
+    @call
+    def multi_contract_chain(
+        self,
+        contract1_id: str,
+        contract2_id: str,
+        start_key: str,
+        middle_key: str,
+        final_key: str,
+    ):
+        """Execute a promise chain across multiple contracts."""
+        near.log_utf8("Starting multi-contract promise chain")
+
+        promise = (
+            Contract(contract1_id, gas=30 * ONE_TGAS)
+            .call("get_value", key=start_key)
+            .then(
+                "chain_to_contract2",
+                contract2_id=contract2_id,
+                middle_key=middle_key,
+                final_key=final_key,
+            )
+        )
+
+        return promise.value()
+
+    @callback
+    def chain_to_contract2(
+        self, result: PromiseResult, contract2_id: str, middle_key: str, final_key: str
+    ):
+        """Chain from contract1 to contract2."""
+        near.log_utf8("Chain to contract2 callback")
+
+        if not result.success:
+            return {"success": False, "error": "Failed to get value from contract1"}
+
+        # Get result from contract1
+        value1 = result.data
+
+        final_promise = (
+            Contract(contract2_id)
+            .call("get_value", key=middle_key)
+            .then("final_callback", value1=value1, final_key=final_key)
+        )
+
+        return final_promise.value()
+
+    @callback
+    def final_callback(self, result: PromiseResult, value1: str, final_key: str):
+        """Final callback to process results from both contracts."""
+        near.log_utf8("Final callback")
+
+        if not result.success:
+            return {"success": False, "error": "Failed to get value from contract2"}
+
+        # Get result from contract2
+        value2 = result.data
+
+        # Combine results from both contracts
+        combined_value = f"Values from contract1: {value1} and contract2: {value2}"
+
+        # Store the combined result
+        Storage.set(final_key, combined_value)
+
+        # Return success with all collected values
+        return {
+            "success": True,
+            "message": "Multi-contract chain completed successfully",
+            "chain_values": [value1, value2],
+            "combined": combined_value,
+        }
+
 
 # Create an instance and export the methods
 contract = MinimalPromiseContract()
@@ -284,3 +355,6 @@ call_nonexistent_method = contract.call_nonexistent_method
 handle_error = contract.handle_error
 execute_batch = contract.execute_batch
 batch_callback = contract.batch_callback
+multi_contract_chain = contract.multi_contract_chain
+chain_to_contract2 = contract.chain_to_contract2
+final_callback = contract.final_callback

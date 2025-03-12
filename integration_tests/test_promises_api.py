@@ -272,3 +272,53 @@ class TestPromisesAPI(NearTestCase):
             args={"key": "remote_batch_key"},
         )
         assert remote_value == "remote_value"
+
+    def test_multi_contract_promise_chain(self):
+        """Test chaining promises across multiple contracts in sequence."""
+        # Setup initial values in both contracts
+        self.instance1.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "chain_start", "value": "value_from_contract1"},
+        )
+
+        self.instance2.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "chain_middle", "value": "value_from_contract2"},
+        )
+
+        # Call a method that creates a chain: contract1 -> contract2 -> contract1
+        result = self.instance1.call_as(
+            account=self.alice,
+            method_name="multi_contract_chain",
+            args={
+                "contract1_id": self.instance1.account_id,
+                "contract2_id": self.instance2.account_id,
+                "start_key": "chain_start",
+                "middle_key": "chain_middle",
+                "final_key": "chain_result",
+            },
+            gas=300 * 10**12,  # Allocate plenty of gas
+        )
+
+        # Parse the JSON result
+        response = json.loads(result)
+
+        # Verify the chain execution succeeded
+        assert response["success"] is True
+        assert "chain_values" in response
+        assert len(response["chain_values"]) == 2
+        assert response["chain_values"][0] == "value_from_contract1"
+        assert response["chain_values"][1] == "value_from_contract2"
+
+        # Verify the final value was stored correctly
+        final_value = self.instance1.call_as(
+            account=self.alice,
+            method_name="get_value",
+            args={"key": "chain_result"},
+        )
+
+        # The final value should contain combined information from both contracts
+        assert "contract1" in final_value
+        assert "contract2" in final_value

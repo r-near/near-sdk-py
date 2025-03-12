@@ -8,7 +8,7 @@ from .batch import PromiseBatch
 class Contract:
     """Fluent interface for calling contract methods."""
 
-    def __init__(self, account_id: str, gas: int = 5 * ONE_TGAS, deposit: int = 0):
+    def __init__(self, account_id: str, gas: int = 10 * ONE_TGAS, deposit: int = 0):
         """
         Initialize a contract proxy.
 
