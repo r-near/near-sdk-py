@@ -170,6 +170,46 @@ class MinimalPromiseContract:
             "chained_value": result.data,
         }
 
+    @call
+    def call_nonexistent_method(self, contract_id: str):
+        """Call a method that doesn't exist to test error handling.
+
+        This demonstrates how to handle promise failures gracefully.
+        """
+        near.log_utf8("Starting call to nonexistent method")
+
+        # Create a contract object with enough gas
+        contract = Contract(contract_id, gas=100 * ONE_TGAS)
+
+        # Call a method that doesn't exist on the target contract
+        promise = contract.call("this_method_does_not_exist")
+
+        # Add a callback to handle the result (which will be an error)
+        final_promise = promise.then("handle_error").gas(100 * ONE_TGAS)
+
+        return final_promise.value()
+
+    @callback
+    def handle_error(self, result: PromiseResult):
+        """Handle error from a failed promise call.
+
+        This demonstrates error handling in callbacks.
+        """
+        near.log_utf8(f"Handling promise result: success={result.success}")
+
+        if result.success:
+            return {
+                "success": True,
+                "message": "Method executed successfully (unexpected)",
+            }
+        else:
+            # Handle the error gracefully
+            return {
+                "success": False,
+                "error": f"Method call failed as expected: status_code={result.status_code}",
+                "handled": True,
+            }
+
 
 # Create an instance and export the methods
 contract = MinimalPromiseContract()
@@ -186,3 +226,5 @@ process_join_callback = contract.process_join_callback
 chain_calls = contract.chain_calls
 process_first_call = contract.process_first_call
 process_second_call = contract.process_second_call
+call_nonexistent_method = contract.call_nonexistent_method
+handle_error = contract.handle_error

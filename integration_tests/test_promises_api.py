@@ -187,3 +187,40 @@ class TestPromisesAPI(NearTestCase):
         assert response["success"] is True
         assert response["original_value"] == "chain_value1"
         assert response["chained_value"] == "chain_value2"
+
+    def test_promise_error_handling(self):
+        """Test how the Promise API handles errors in cross-contract calls."""
+        # Set a value in contract1 for our test
+        self.instance1.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "error_key", "value": "original_value"},
+        )
+
+        # Call a method that will invoke a non-existent method on contract2
+        # This should fail, but our contract should handle it gracefully
+        result = self.instance1.call_as(
+            account=self.alice,
+            method_name="call_nonexistent_method",
+            args={"contract_id": self.instance2.account_id},
+            gas=300 * 10**12,  # Allocate plenty of gas
+        )
+
+        # Parse the JSON result
+        response = json.loads(result)
+
+        # Verify that the error was properly detected and handled
+        assert response["success"] is False
+        assert "error" in response
+        assert (
+            "method does not exist" in response["error"].lower()
+            or "failed" in response["error"].lower()
+        )
+
+        # Verify that the original state remains unchanged
+        check_value = self.instance1.call_as(
+            account=self.alice,
+            method_name="get_value",
+            args={"key": "error_key"},
+        )
+        assert check_value == "original_value"
