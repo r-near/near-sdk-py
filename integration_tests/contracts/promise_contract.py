@@ -113,6 +113,63 @@ class MinimalPromiseContract:
         # Return combined results
         return {"success": True, "keys": keys, "values": values}
 
+    @call
+    def chain_calls(self, contract_id1: str, contract_id2: str, key1: str, key2: str):
+        """Chain calls to retrieve values from multiple contracts sequentially.
+
+        This demonstrates how to chain promises to process data in sequence, with each
+        promise depending on the result of the previous one.
+        """
+        # Create contract objects
+        contract1 = Contract(contract_id1)
+
+        # Start the chain by calling the first contract
+        promise1 = contract1.call("get_value", key=key1)
+
+        # Then call the second contract, passing along the key for the second value
+        # Notice we don't need to create a Contract object for contract2 here
+        combined_promise = promise1.gas(20 * ONE_TGAS).then(
+            "process_first_call", second_contract=contract_id2, key2=key2
+        )
+
+        # Return the final promise result
+        return combined_promise.value()
+
+    @callback
+    def process_first_call(
+        self, result: PromiseResult, second_contract: str, key2: str
+    ):
+        """Process the result from the first call and make the next call in the chain."""
+        if not result.success:
+            return {"success": False, "error": "First promise failed"}
+
+        # Store the result from the first call
+        first_value = result.data
+
+        # Create a contract object for the second call
+        contract2 = Contract(second_contract)
+
+        # Make the second call, passing the result from the first call in the arguments
+        promise2 = contract2.call("get_value", key=key2)
+
+        # Add another callback to process the second result
+        final_promise = promise2.then("process_second_call", original_value=first_value)
+
+        return final_promise.value()
+
+    @callback
+    def process_second_call(self, result: PromiseResult, original_value: str):
+        """Process the result from the second call and combine with the first result."""
+        if not result.success:
+            return {"success": False, "error": "Second promise failed"}
+
+        # Combine results from both calls
+        return {
+            "success": True,
+            "original_value": original_value,
+            "chained_value": result.data,
+        }
+
 
 # Create an instance and export the methods
 contract = MinimalPromiseContract()
@@ -126,3 +183,6 @@ call_with_callback = contract.call_with_callback
 process_callback = contract.process_callback
 join_promises = contract.join_promises
 process_join_callback = contract.process_join_callback
+chain_calls = contract.chain_calls
+process_first_call = contract.process_first_call
+process_second_call = contract.process_second_call

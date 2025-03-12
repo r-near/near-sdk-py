@@ -151,3 +151,39 @@ class TestPromisesAPI(NearTestCase):
         # Verify that both values were retrieved and combined
         assert response["success"] is True
         assert response["values"] == ["join_value1", "join_value2"]
+
+    def test_promise_chain_call(self):
+        """Test promise chaining to call methods on different contracts in sequence."""
+        # First set values in both contracts
+        self.instance1.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "chain_key1", "value": "chain_value1"},
+        )
+
+        self.instance2.call_as(
+            account=self.alice,
+            method_name="set_value",
+            args={"key": "chain_key2", "value": "chain_value2"},
+        )
+
+        # Call a method that chains promises to call the first contract, then the second
+        result = self.instance1.call_as(
+            account=self.alice,
+            method_name="chain_calls",
+            args={
+                "contract_id1": self.instance1.account_id,
+                "contract_id2": self.instance2.account_id,
+                "key1": "chain_key1",
+                "key2": "chain_key2",
+            },
+            gas=300 * 10**12,  # Allocate more gas for chained promises
+        )
+
+        # Parse the JSON result
+        response = json.loads(result)
+
+        # Verify the chained operations worked
+        assert response["success"] is True
+        assert response["original_value"] == "chain_value1"
+        assert response["chained_value"] == "chain_value2"
