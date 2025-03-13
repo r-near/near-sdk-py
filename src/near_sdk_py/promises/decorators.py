@@ -38,6 +38,17 @@ def callback(func: Callable[..., Any]) -> Callable[..., Any]:
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        # Security check 1: Verify this is actually being called as a callback
+        results_count = near.promise_results_count()
+        if results_count == 0:
+            near.panic_utf8("This function can only be called as a callback")
+            return
+
+        # Security check 2: Verify this is being called by the contract itself
+        if near.predecessor_account_id() != near.current_account_id():
+            near.panic_utf8("Callbacks can only be called by the contract itself")
+            return
+
         # Get the promise result
         status_code, data = near.promise_result(0)
 
@@ -92,6 +103,17 @@ def multi_callback(func: Callable[..., Any]) -> Callable[..., Any]:
 
     @wraps(func)
     def wrapper(self, *args, **kwargs):
+        # Security check 1: Verify this is actually being called as a callback
+        results_count = near.promise_results_count()
+        if results_count == 0:
+            near.panic_utf8("This function can only be called as a callback")
+            return
+
+        # Security check 2: Verify this is being called by the contract itself
+        if near.predecessor_account_id() != near.current_account_id():
+            near.panic_utf8("Callbacks can only be called by the contract itself")
+            return
+
         # Get the number of promise results
         results_count = near.promise_results_count()
 
