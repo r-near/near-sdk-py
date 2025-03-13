@@ -27,11 +27,11 @@ wheels = [
 
 [[package]]
 name = "attrs"
-version = "25.2.0"
+version = "25.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/69/82/3c4e1d44f3cbaa2a578127d641fe385ba3bff6c38b789447ae11a21fa413/attrs-25.2.0.tar.gz", hash = "sha256:18a06db706db43ac232cce80443fcd9f2500702059ecf53489e3c5a3f417acaf", size = 812038 }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/b0/1367933a8532ee6ff8d63537de4f1177af4bff9f3e829baf7331f595bb24/attrs-25.3.0.tar.gz", hash = "sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b", size = 812032 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/33/7a7388b9ef94aab40539939d94461ec682afbd895458945ed25be07f03f6/attrs-25.2.0-py3-none-any.whl", hash = "sha256:611344ff0a5fed735d86d7784610c84f8126b95e549bcad9ff61b4242f2d386b", size = 64016 },
+    { url = "https://files.pythonhosted.org/packages/77/06/bb80f5f86020c4551da315d78b3ab75e8228f89f0162f2c3a819e407941a/attrs-25.3.0-py3-none-any.whl", hash = "sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3", size = 63815 },
 ]
 
 [[package]]
@@ -529,7 +529,7 @@ wheels = [
 
 [[package]]
 name = "near-pytest"
-version = "0.5.1"
+version = "0.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "base58" },
@@ -539,9 +539,9 @@ dependencies = [
     { name = "pytest" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/44/e2/61fc5e34a2295d51b9d5a62c3fc027ff707db4818adf2f6be75c226f615f/near_pytest-0.5.1.tar.gz", hash = "sha256:723f32622da29dc6fbd6de13a16f74adfab058002f99f6c9b4e1b8ad0783c633", size = 65138 }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/70/b51c28496a30cb7298c6b6cd5effcf2171299603261985c6d7077af2e1d5/near_pytest-0.5.2.tar.gz", hash = "sha256:f02a295d8f15fb0f484746f31d5d119704c0474a76255982f947d1eae5b7db0f", size = 65172 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7d/d7/d6b85939626ee9969f149c8fb7acc103ca9184c3fdcd4ebec63ac8130d84/near_pytest-0.5.1-py3-none-any.whl", hash = "sha256:0399bfef06313e455a8ca05a253c3e78b84f5dae1869e6bedf8be11c1bbbc966", size = 16877 },
+    { url = "https://files.pythonhosted.org/packages/63/d3/3680b97e9fda2e6db867bebccc9bd4bb7e6f2909066eb739d7140f2570e5/near_pytest-0.5.2-py3-none-any.whl", hash = "sha256:43e7d17ce3c8906127064e99d38812f6a69b8c19fe85740db60ede0d3bcf9114", size = 16880 },
 ]
 
 [[package]]
@@ -564,7 +564,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
-    { name = "near-pytest", specifier = ">=0.5.1" },
+    { name = "near-pytest", specifier = ">=0.5.2" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
@@ -573,7 +573,7 @@ dev = [
 
 [[package]]
 name = "nearc"
-version = "0.7.1"
+version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "near-abi-py" },
@@ -585,9 +585,9 @@ dependencies = [
     { name = "types-zstd" },
     { name = "zstd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/94/5a/02336eb836efd04a74fc084a6236f5e636c7ef6726408a581d19f4a4f077/nearc-0.7.1.tar.gz", hash = "sha256:c65b86a3c8d7124e22137fe81a295d0f7ae5d192d577d7efe7927caa78e4e978", size = 8355494 }
+sdist = { url = "https://files.pythonhosted.org/packages/54/8e/d29a20d60dabed9625ff3a371ac0e2ceb328b4e86a45a4e099c076f84ba3/nearc-0.7.2.tar.gz", hash = "sha256:0ea394a39c50f53c57d7c8b3f94b7dc9df3fecb638ec24bc70c465d871c5af69", size = 8355588 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c0/cf/b53b1d039fd40cc9fe3d5c8a9bdcf08b50ef6784d5bc4151b2f5d95f5f44/nearc-0.7.1-py3-none-any.whl", hash = "sha256:6f3a40d024fa0adbcbc3f9489d276ed30446c5f78bf5cc4b494c168744bcd49b", size = 11593780 },
+    { url = "https://files.pythonhosted.org/packages/8b/54/cb3b1dbf0aa9e044e9448b0d4fcc7cfb7000b44304ba070660935f77f57d/nearc-0.7.2-py3-none-any.whl", hash = "sha256:948db97fed887e24e7a7b3623a25c8c2ee3413bdb5567f083f8553639f0c94b5", size = 11593796 },
 ]
 
 [[package]]
