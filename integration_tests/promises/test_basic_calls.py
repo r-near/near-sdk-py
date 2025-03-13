@@ -10,7 +10,6 @@ These examples serve as a foundation for understanding more complex Promise patt
 """
 
 from near_pytest.testing import NearTestCase
-import json
 
 
 class TestBasicPromiseCalls(NearTestCase):
