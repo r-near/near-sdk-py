@@ -165,52 +165,44 @@ Log.event("nft_mint", {
 })
 ```
 
-### Cross-Contract Calls
+## Cross-Contract Calls with Promises API
 
-Work with NEAR's asynchronous cross-contract calls using the Promises API:
+The SDK provides a powerful Promises API for making cross-contract calls with elegant method chaining:
 
 ```python
-from near_sdk_py import call, callback, CrossContract, ONE_TGAS
+from near_sdk_py import call, callback, Contract, PromiseResult
 
-class MyContract:
+class CrossContractExample:
     @call
-    def update_profile(self, username: str):
-        return CrossContract.call_with_callback(
-            "profile.near",               # Target contract
-            "set_username",               # Method to call
-            {"username": username},       # Arguments
-            gas=5 * ONE_TGAS,             # Gas for the call
-            callback_method="on_update_complete"  # Our callback
-        )
-
+    def get_token_balance(self, token_contract_id: str, account_id: str):
+        # Create a contract instance and chain the operations
+        promise = Contract(token_contract_id)
+            .call("ft_balance_of", account_id=account_id)
+            .then("process_balance", account_id=account_id)
+            .value()
+        
+        return promise
+    
     @callback
-    def on_update_complete(self, promise_result: dict):
-        if promise_result["status"] == "Successful":
-            return "Profile updated successfully!"
+    def process_balance(self, result: PromiseResult, account_id: str):
+        if result.success:
+            return {
+                "account_id": account_id,
+                "balance": result.data,
+                "formatted_balance": f"{int(result.data) / 10**24:.2f} NEAR"
+            }
         else:
-            return "Update failed!"
+            return {"success": false, "error": "Failed to get balance"}
 ```
 
-The `@callback` decorator helps process responses from other contracts, while `CrossContract.call_with_callback()` streamlines the common pattern of making a call and handling its result.
+Key features of the Promises API:
+- **Intuitive interface** with method chaining
+- **Callback decorators** for easy result handling
+- **Batch operations** for multiple actions in one transaction
+- **Account operations** like creating subaccounts and managing access keys
+- **Comprehensive error handling** for robust cross-contract interactions
 
-For advanced use cases, you can also build promise chains manually:
-
-```python
-# Make initial call
-promise = CrossContract.call("token.near", "get_balance", {"account_id": "alice.near"})
-
-# Chain a callback to process the result
-callback = CrossContract.then(
-    promise,
-    CrossContract.current_account_id(),
-    "on_balance_received"
-)
-
-# Return the final result
-return CrossContract.return_value(callback)
-```
-
-See the [Promises API documentation](docs/promises-api.md) for more detailed examples.
+[Read the Promises API documentation →](docs/promises/)
 
 ## 🔐 Security Best Practices
 
@@ -218,13 +210,13 @@ See the [Promises API documentation](docs/promises-api.md) for more detailed exa
 # Require exactly 1 yoctoNEAR to prove key ownership
 @call
 def transfer_ownership(self, new_owner):
-    Contract.assert_one_yocto()  # Ensures tx is signed (non-delegated)
+    BaseContract.assert_one_yocto()  # Ensures tx is signed (non-delegated)
     # Implementation...
 
 # Require minimum deposit for a function
 @call
 def place_bid(self, token_id):
-    Contract.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
+    BaseContract.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
     # Implementation...
 ```
 

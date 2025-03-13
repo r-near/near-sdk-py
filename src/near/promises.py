@@ -217,7 +217,7 @@ def promise_batch_action_add_key_with_full_access(
 
     Args:
         promise_index: The index of the promise batch
-        public_key: The public key to add
+        public_key: The public key to add (borsh-serialized)
         nonce: The nonce for the key
 
     Note:

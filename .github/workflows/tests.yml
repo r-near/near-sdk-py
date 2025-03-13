@@ -1,0 +1,59 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  EM_VERSION: 4.0.4
+  EM_CACHE_FOLDER: 'emsdk-cache'
+  NEAR_PYTEST_LOG_LEVEL: DEBUG
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup emsdk cache
+        uses: actions/cache@v4
+        with:
+          path: ${{env.EM_CACHE_FOLDER}}
+          key: ${{env.EM_VERSION}}-${{ runner.os }}
+
+      - name: Setup build and pytest directories cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            examples/build
+            examples/*/build
+            ~/.near-pytest
+          key: build-${{ runner.os }}-${{ hashFiles('examples/**') }}-${{ github.sha }}
+          restore-keys: |
+            build-${{ runner.os }}-${{ hashFiles('examples/**') }}-
+            build-${{ runner.os }}-
+
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+            version: ${{env.EM_VERSION}}
+            actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install self into venv
+        run: uv pip install .
+
+      - name: Run tests
+        run: |
+            source .venv/bin/activate
+            NEAR_PYTEST_LOG_LEVEL=DEBUG pytest -xvs integration_tests/
