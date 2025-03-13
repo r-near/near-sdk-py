@@ -56,4 +56,4 @@ jobs:
       - name: Run tests
         run: |
             source .venv/bin/activate
-            NEAR_PYTEST_LOG_LEVEL=DEBUG pytest -n auto --dist=loadscope -xvs integration_tests/
+            NEAR_PYTEST_LOG_LEVEL=DEBUG pytest -xvs integration_tests/
