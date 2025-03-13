@@ -128,7 +128,7 @@ class MinimalPromiseContract:
 
         # Then call the second contract, passing along the key for the second value
         # Notice we don't need to create a Contract object for contract2 here
-        combined_promise = promise1.gas(20 * ONE_TGAS).then(
+        combined_promise = promise1.gas(30 * ONE_TGAS).then(
             "process_first_call", second_contract=contract_id2, key2=key2
         )
 
