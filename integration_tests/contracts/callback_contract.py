@@ -7,11 +7,10 @@ This contract demonstrates callback patterns with NEAR Promises:
 - Data passing between promises in a chain
 """
 
-from near_sdk_py import call, view, Storage
+from near_sdk_py import call, view, Storage, Log
 from near_sdk_py.promises import Contract, callback, multi_callback, PromiseResult
 from near_sdk_py import ONE_TGAS
 from typing import List
-import near
 
 
 class CallbackContract:
@@ -61,10 +60,10 @@ class CallbackContract:
             result: The PromiseResult containing status and data
             key: The original key requested (passed from the calling function)
         """
-        near.log_utf8("Processing callback")
-        near.log_utf8(f"Key: {key}")
-        near.log_utf8(f"Status: {result.status_code}")
-        near.log_utf8(f"Data: {result.data}")
+        Log.info("Processing callback")
+        Log.info(f"Key: {key}")
+        Log.info(f"Status: {result.status_code}")
+        Log.info(f"Data: {result.data}")
 
         # Process the result and return structured data
         return {"success": True, "key": key, "value": result.data, "processed": True}
