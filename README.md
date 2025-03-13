@@ -2,13 +2,13 @@
 
 A higher-level API for building NEAR smart contracts in Python.
 
-[![PyPI version](https://img.shields.io/badge/pypi-0.1.0-blue.svg)](https://pypi.org/project/near-sdk-py/)
+[![PyPI version](https://img.shields.io/pypi/v/near-sdk-py)](https://pypi.org/project/near-sdk-py/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Versions](https://img.shields.io/badge/python-3.11%20|%203.12-blue)](https://pypi.org/project/near-sdk-py/)
 
 ## Introduction
 
-NEAR Python SDK provides a structured abstraction layer over the low-level NEAR blockchain API. This library streamlines the development of smart contracts by offering type-safe interfaces, standardized patterns, and utility functions that handle common blockchain operations. Built on top of the near-py-tool project, it enables developers to write maintainable and secure contract code with reduced complexity.
+NEAR Python SDK provides a structured abstraction layer over the low-level NEAR blockchain API. This library streamlines the development of smart contracts by offering type-safe interfaces, standardized patterns, and utility functions that handle common blockchain operations. It enables developers to write maintainable and secure contract code with reduced complexity.
 
 ```python
 from near_sdk_py import view, Storage
@@ -21,9 +21,8 @@ def get_greeting():
 ## 🔥 Key Features
 
 - 📦 **Simple Storage API** - Store/retrieve data with intuitive methods
-- 🔄 **Smart Contract Lifecycle** - Easily manage initialization and upgrades
+- 🔄 **Cross-Contract Calls** - Seamlessly interact with other contracts using Promises
 - 🔍 **Decorators** - Clearly mark functions as `@view`, `@call`, or `@init`
-- 🌐 **Cross-Contract Calls** - Seamlessly interact with other contracts
 - 📝 **Structured Logging** - NEP-standard event logging made simple
 - 🛡️ **Built-in Security** - Validation helpers for common security patterns
 - 🧩 **Modular Design** - Well-organized codebase for maximum maintainability
@@ -176,10 +175,12 @@ class CrossContractExample:
     @call
     def get_token_balance(self, token_contract_id: str, account_id: str):
         # Create a contract instance and chain the operations
-        promise = Contract(token_contract_id)
+        promise = (
+            Contract(token_contract_id)
             .call("ft_balance_of", account_id=account_id)
             .then("process_balance", account_id=account_id)
             .value()
+        )
         
         return promise
     
@@ -192,7 +193,7 @@ class CrossContractExample:
                 "formatted_balance": f"{int(result.data) / 10**24:.2f} NEAR"
             }
         else:
-            return {"success": false, "error": "Failed to get balance"}
+            return {"success": False, "error": "Failed to get balance"}
 ```
 
 Key features of the Promises API:
@@ -207,6 +208,8 @@ Key features of the Promises API:
 ## 🔐 Security Best Practices
 
 ```python
+from near_sdk_py import call, BaseContract, ONE_NEAR
+
 # Require exactly 1 yoctoNEAR to prove key ownership
 @call
 def transfer_ownership(self, new_owner):
