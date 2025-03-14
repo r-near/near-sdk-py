@@ -44,33 +44,25 @@ pip install near-sdk-py
 ```python
 from near_sdk_py import view, call, init, Context, Storage, Log
 
-class GreetingContract:
+class GreetingContract(Contract):
     @init
     def new(self, owner_id=None):
         """Initialize the contract with optional owner"""
-        owner = owner_id or Context.predecessor_account_id()
-        Storage.set("owner", owner)
-        Log.info(f"Contract initialized by {owner}")
+        owner = owner_id or self.predecessor_account_id
+        self.storage["owner"] = owner
+        self.log_info(f"Contract initialized by {owner}")
         return True
     
     @call
     def set_greeting(self, message):
         """Store a greeting message (requires gas)"""
-        Storage.set("greeting", message)
+        self.storage["greeting"] = message
         return f"Greeting updated to: {message}"
     
     @view
     def get_greeting(self):
         """Retrieve the greeting message (free, no gas needed)"""
-        return Storage.get_string("greeting") or "Hello, NEAR world!"
-
-# Export the contract methods
-contract = GreetingContract()
-
-# These exports make functions available to the NEAR runtime
-new = contract.new
-set_greeting = contract.set_greeting
-get_greeting = contract.get_greeting
+        return self.storage.get("greeting", "Hello, NEAR world!")
 ```
 
 ### 2️⃣ Build and Deploy
@@ -169,14 +161,14 @@ Log.event("nft_mint", {
 The SDK provides a powerful Promises API for making cross-contract calls with elegant method chaining:
 
 ```python
-from near_sdk_py import call, callback, Contract, PromiseResult
+from near_sdk_py import call, callback, CrossContract, PromiseResult
 
 class CrossContractExample:
     @call
     def get_token_balance(self, token_contract_id: str, account_id: str):
         # Create a contract instance and chain the operations
         promise = (
-            Contract(token_contract_id)
+            CrossContract(token_contract_id)
             .call("ft_balance_of", account_id=account_id)
             .then("process_balance", account_id=account_id)
             .value()
@@ -208,18 +200,18 @@ Key features of the Promises API:
 ## 🔐 Security Best Practices
 
 ```python
-from near_sdk_py import call, BaseContract, ONE_NEAR
+from near_sdk_py import call, ONE_NEAR
 
 # Require exactly 1 yoctoNEAR to prove key ownership
 @call
 def transfer_ownership(self, new_owner):
-    BaseContract.assert_one_yocto()  # Ensures tx is signed (non-delegated)
+    self.assert_one_yocto()  # Ensures tx is signed (non-delegated)
     # Implementation...
 
 # Require minimum deposit for a function
 @call
 def place_bid(self, token_id):
-    BaseContract.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
+    self.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
     # Implementation...
 ```
 
@@ -234,7 +226,6 @@ The SDK includes starter templates for common contract types:
 
 ## 📈 Performance Considerations
 
-- Use `Storage.get_json()` for complex data instead of parsing manually
 - Group related data in a single storage entry to reduce calls
 - Implement pagination for methods that return large collections
 
