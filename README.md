@@ -20,6 +20,7 @@ A Pythonic interface for building NEAR smart contracts.
 
 ```bash
 uv init your-contract
+cd your-contract
 uv add near-sdk-py
 ```
 
@@ -47,7 +48,7 @@ class GreetingContract(Contract):
 ### 2️⃣ Build and Deploy
 
 ```bash
-nearc build greeting_contract.py
+uvx nearc build
 near deploy your-contract.testnet greeting_contract.wasm
 ```
 
@@ -241,7 +242,7 @@ class SecureContract(Contract):
 ```
 ## 🧪 Testing with near-pytest
 
-The NEAR Python SDK works seamlessly with [near-pytest](https://pypi.org/project/near-pytest/), a pytest-native framework for testing NEAR smart contracts. Together, they provide a powerful toolchain for developing and testing contracts.
+The NEAR Python SDK works seamlessly with [near-pytest](https://github.com/r-near/near-pytest/), a pytest-native framework for testing NEAR smart contracts. Together, they provide a powerful toolchain for developing and testing contracts.
 
 ### Key Features of near-pytest
 
