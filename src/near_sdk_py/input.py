@@ -4,9 +4,9 @@ Input handling utilities for NEAR smart contracts.
 
 import json
 from typing import Any
+from .contract import InvalidInput
 
 import near
-from .contract import InputError
 
 
 class Input:
@@ -28,4 +28,4 @@ class Input:
         try:
             return json.loads(Input.string())
         except Exception as e:
-            raise InputError(f"Failed to decode JSON input: {e}")
+            raise InvalidInput(f"Failed to decode JSON input: {e}")

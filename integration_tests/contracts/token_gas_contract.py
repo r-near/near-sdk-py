@@ -8,7 +8,7 @@ This contract demonstrates how to:
 """
 
 from near_sdk_py import call, view, Storage, Context, Log
-from near_sdk_py.promises import Contract, callback, PromiseResult
+from near_sdk_py.promises import CrossContract, callback, PromiseResult
 from near_sdk_py import ONE_TGAS
 from typing import Optional
 
@@ -42,7 +42,7 @@ class TokenGasContract:
         Log.info(f"Attaching {amount} yoctoNEAR to call")
 
         # Create contract with the specified deposit
-        contract = Contract(contract_id).deposit(amount)
+        contract = CrossContract(contract_id).deposit(amount)
 
         # Make the call with attached tokens
         promise = contract.call(method, **args)
@@ -81,7 +81,7 @@ class TokenGasContract:
         Log.info(f"Attaching {gas_amount} gas to call")
 
         # Create contract with specified gas
-        contract = Contract(contract_id, gas=gas_amount)
+        contract = CrossContract(contract_id, gas=gas_amount)
 
         # Make the call with fixed gas
         promise = contract.call(method, **args)
@@ -129,7 +129,7 @@ class TokenGasContract:
         Log.info(f"Using {gas_to_use} gas ({1}/{gas_fraction} of available)")
 
         # Create contract with calculated gas
-        contract = Contract(contract_id, gas=gas_to_use)
+        contract = CrossContract(contract_id, gas=gas_to_use)
 
         # Make the call
         promise = contract.call(method, **args)
@@ -174,7 +174,7 @@ class TokenGasContract:
         Log.info(f"Transferring {amount} yoctoNEAR to {recipient_id}")
 
         # Create a batch for operations on the recipient account
-        contract = Contract(recipient_id)
+        contract = CrossContract(recipient_id)
         batch = contract.batch()
 
         # Add transfer action
@@ -228,20 +228,3 @@ class TokenGasContract:
             "deposit": deposit,
             "sender": sender,
         }
-
-
-# Create an instance and export the methods
-contract = TokenGasContract()
-
-# Export contract methods
-get_value = contract.get_value
-set_value = contract.set_value
-call_with_tokens = contract.call_with_tokens
-process_token_call = contract.process_token_call
-call_with_fixed_gas = contract.call_with_fixed_gas
-process_fixed_gas_call = contract.process_fixed_gas_call
-call_with_proportional_gas = contract.call_with_proportional_gas
-process_proportional_call = contract.process_proportional_call
-transfer_and_call = contract.transfer_and_call
-transfer_callback = contract.transfer_callback
-receive_funds = contract.receive_funds

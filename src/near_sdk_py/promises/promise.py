@@ -8,8 +8,8 @@ cross-contract calls with method chaining and modern Python syntax.
 from typing import List, TypeVar
 
 import near
+import json
 from near_sdk_py.constants import ONE_TGAS
-from near_sdk_py.cross_contract import CrossContract
 from .batch import PromiseBatch
 
 T = TypeVar("T")
@@ -81,16 +81,17 @@ class Promise:
         Returns:
             A new Promise representing the chained operation
         """
-        promise = CrossContract.then(
-            self._promise_id,
-            near.current_account_id(),
-            method,
-            kwargs,
-            0,  # No deposit for callbacks to self
-            self._gas,
-        )
+        if kwargs is None:
+            args_str = ""
+        elif isinstance(kwargs, str):
+            args_str = kwargs
+        else:
+            args_str = json.dumps(kwargs)
 
-        return Promise(promise)
+        promise_id = near.promise_then(
+            self._promise_id, near.current_account_id(), method, args_str, 0, self._gas
+        )
+        return Promise(promise_id)
 
     def then_call(self, contract_id: str, method: str, **kwargs) -> "Promise":
         """
@@ -104,11 +105,18 @@ class Promise:
         Returns:
             A new Promise representing the chained call
         """
-        promise = CrossContract.then(
-            self._promise_id, contract_id, method, kwargs, self._deposit, self._gas
+        if kwargs is None:
+            args_str = ""
+        elif isinstance(kwargs, str):
+            args_str = kwargs
+        else:
+            args_str = json.dumps(kwargs)
+
+        promise_id = near.promise_then(
+            self._promise_id, contract_id, method, args_str, self._deposit, self._gas
         )
 
-        return Promise(promise)
+        return Promise(promise_id)
 
     def then_batch(self, account_id: str) -> PromiseBatch:
         """
@@ -140,16 +148,23 @@ class Promise:
         # Convert Promise objects to their IDs
         promise_ids = [self._promise_id] + [p._promise_id for p in other_promises]
 
-        combined = CrossContract.and_then(
-            promise_ids,
+        combined_promise = near.promise_and(promise_ids)
+        if kwargs is None:
+            args_str = ""
+        elif isinstance(kwargs, str):
+            args_str = kwargs
+        else:
+            args_str = json.dumps(kwargs)
+
+        promise_id = near.promise_then(
+            combined_promise,
             near.current_account_id(),
             callback,
-            kwargs,
-            0,  # No deposit
+            args_str,
+            0,
             self._gas,
         )
-
-        return Promise(combined)
+        return Promise(promise_id)
 
     @staticmethod
     def all(promises: List["Promise"]) -> int:
@@ -171,7 +186,7 @@ class Promise:
 
         This should be the final operation in your promise chain.
         """
-        return CrossContract.return_value(self._promise_id)
+        return near.promise_return(self._promise_id)
 
 
 class PromiseResult:

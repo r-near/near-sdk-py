@@ -2,81 +2,71 @@
 Decorator utilities for NEAR smart contracts.
 """
 
-from typing import Any, Callable, TypeVar
-
 import near
 from .input import Input
 from .log import Log
 from .value_return import ValueReturn
+from .contract import ContractPanic, ContractError
+from functools import wraps
 
-T = TypeVar("T")
 
-
-def contract_method(func: Callable[..., T]) -> Callable[..., T]:
+def contract_method(func):
     """
-    Decorator for contract methods that handles input deserialization
-    and return value serialization. Much simpler version compatible with MicroPython.
-
-    When using this decorator:
-    - Your method will receive parsed JSON input as kwargs when called by the blockchain
-    - Your method's return value will be properly serialized for the blockchain
+    Enhanced contract method decorator that handles exceptions and input/output serialization.
     """
 
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        # If no kwargs were provided and this appears to be a blockchain call
-        # (typically just the self argument, or empty for module-level functions)
-        if len(kwargs) == 0 and len(args) <= 1:
-            try:
-                # Parse input JSON and use it as kwargs
-                input_json = Input.json()
-                if isinstance(input_json, dict):
-                    kwargs = input_json
-            except Exception as e:
-                # If JSON parsing fails, just log and continue
-                # Your method will need to handle getting input another way
-                Log.warning(f"Failed to parse input as JSON: {e}")
+        try:
+            # If no kwargs were provided and this appears to be a blockchain call
+            if len(kwargs) == 0 and len(args) <= 1:
+                try:
+                    # Parse input JSON and use it as kwargs
+                    input_json = Input.json()
+                    if isinstance(input_json, dict):
+                        kwargs = input_json
+                except Exception as e:
+                    # Log but don't fail - method might not need input
+                    Log.warning(f"Failed to parse input as JSON: {e}")
 
-        # Call the actual function with the processed args and kwargs
-        result = func(*args, **kwargs)
+            # Call the actual function
+            result = func(*args, **kwargs)
 
-        # Handle the return value
-        if result is not None:
-            if isinstance(result, bytes):
-                ValueReturn.bytes(result)
-            elif isinstance(result, str):
-                ValueReturn.string(result)
-            else:
-                ValueReturn.json(result)
+            # Handle the return value
+            if result is not None:
+                if isinstance(result, bytes):
+                    ValueReturn.bytes(result)
+                elif isinstance(result, str):
+                    ValueReturn.string(result)
+                else:
+                    ValueReturn.json(result)
 
-        return result
+            return result
 
-    return wrapper
+        except ContractPanic as e:
+            # Directly panic with the exception message
+            near.panic_utf8(str(e))
+        except ContractError as e:
+            # Handle other contract errors with a structured message
+            near.panic_utf8(f"{e.__class__.__name__}: {str(e)}")
+        except Exception as e:
+            # Unexpected errors
+            near.panic_utf8(f"Unexpected error: {str(e)}")
 
-
-def export(func: Callable[..., Any]) -> Callable[..., Any]:
-    """
-    Decorator for exported contract methods
-    Combines with @near.export to expose the method to the blockchain
-    """
-    return near.export(contract_method(func))
-
-
-def view(func: Callable[..., Any]) -> Callable[..., Any]:
-    """
-    Decorator for view methods (read-only)
-    """
-    return export(func)
+    # Export the function to make it callable from the blockchain
+    return near.export(wrapper)
 
 
-def call(func: Callable[..., Any]) -> Callable[..., Any]:
-    """
-    Decorator for call methods (mutable)
-    """
-    return export(func)
+def view(func):
+    """Decorator for view methods (read-only)"""
+    return contract_method(func)
 
 
-def init(func: Callable[..., Any]) -> Callable[..., Any]:
-    """
-    Decorator for contract initialization methods
-    """
-    return export(func)
+def call(func):
+    """Decorator for call methods (mutable)"""
+    return contract_method(func)
+
+
+def init(func):
+    """Decorator for contract initialization methods"""
+    return contract_method(func)

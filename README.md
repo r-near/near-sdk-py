@@ -1,187 +1,201 @@
 # NEAR Python SDK
 
-A higher-level API for building NEAR smart contracts in Python.
+A Pythonic interface for building NEAR smart contracts.
 
 [![PyPI version](https://img.shields.io/pypi/v/near-sdk-py)](https://pypi.org/project/near-sdk-py/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Versions](https://img.shields.io/badge/python-3.11%20|%203.12-blue)](https://pypi.org/project/near-sdk-py/)
 
-## Introduction
+## ✨ Highlights
 
-NEAR Python SDK provides a structured abstraction layer over the low-level NEAR blockchain API. This library streamlines the development of smart contracts by offering type-safe interfaces, standardized patterns, and utility functions that handle common blockchain operations. It enables developers to write maintainable and secure contract code with reduced complexity.
+- **Class-Based Contracts** - Clean, intuitive inheritance pattern
+- **Pythonic Storage** - Dictionary-like interface for on-chain data
+- **Elegant Promise API** - Intuitive chaining for cross-contract calls
+- **Native Exception Handling** - Use try/except like regular Python
+- **Ergonomic Context Access** - Properties instead of static methods
 
-```python
-from near_sdk_py import view, Storage
+## 🚀 Getting Started
 
-@view
-def get_greeting():
-    return Storage.get_string("greeting") or "Hello, NEAR world!"
-```
-
-## 🔥 Key Features
-
-- 📦 **Simple Storage API** - Store/retrieve data with intuitive methods
-- 🔄 **Cross-Contract Calls** - Seamlessly interact with other contracts using Promises
-- 🔍 **Decorators** - Clearly mark functions as `@view`, `@call`, or `@init`
-- 📝 **Structured Logging** - NEP-standard event logging made simple
-- 🛡️ **Built-in Security** - Validation helpers for common security patterns
-- 🧩 **Modular Design** - Well-organized codebase for maximum maintainability
-
-## 📋 Installation
+### 0️⃣ Install SDK
 
 ```bash
-# Install using uv
+uv init your-contract
+cd your-contract
 uv add near-sdk-py
-
-# Traditional pip install
-pip install near-sdk-py
 ```
-
-## 🚦 Getting Started
 
 ### 1️⃣ Create Your Contract
 
 ```python
-from near_sdk_py import view, call, init, Context, Storage, Log
+from near_sdk_py import Contract, view, call, init
 
-class GreetingContract:
+class GreetingContract(Contract):
     @init
-    def new(self, owner_id=None):
-        """Initialize the contract with optional owner"""
-        owner = owner_id or Context.predecessor_account_id()
-        Storage.set("owner", owner)
-        Log.info(f"Contract initialized by {owner}")
-        return True
-    
-    @call
-    def set_greeting(self, message):
-        """Store a greeting message (requires gas)"""
-        Storage.set("greeting", message)
-        return f"Greeting updated to: {message}"
+    def initialize(self, default_message="Hello"):
+        self.storage["greeting"] = default_message
+        return {"success": True}
     
     @view
     def get_greeting(self):
-        """Retrieve the greeting message (free, no gas needed)"""
-        return Storage.get_string("greeting") or "Hello, NEAR world!"
-
-# Export the contract methods
-contract = GreetingContract()
-
-# These exports make functions available to the NEAR runtime
-new = contract.new
-set_greeting = contract.set_greeting
-get_greeting = contract.get_greeting
+        return self.storage.get("greeting", "Hello, world!")
+    
+    @call
+    def set_greeting(self, message):
+        self.storage["greeting"] = message
+        return {"success": True}
 ```
 
 ### 2️⃣ Build and Deploy
 
-Use [nearc](https://github.com/r-near/nearc) to compile your contract:
-
 ```bash
-# Create a new project
-uv init greeting-contract
-cd greeting-contract
-
-# Install the SDK
-uv add near-sdk-py
-
-# Create your contract file
-# (Copy your contract code into contract.py)
-
-# Compile the contract
-uvx nearc contract.py
+uvx nearc build
+near deploy your-contract.testnet greeting_contract.wasm
 ```
 
-This will generate a WebAssembly (`.wasm`) file that can be deployed to the NEAR blockchain.
-
-### 3️⃣ Deploy to NEAR
-
-After compiling your contract, use the NEAR CLI to deploy it:
+### 3️⃣ Interact With Your Contract
 
 ```bash
-# Deploy to testnet
-near deploy your-contract.testnet contract.wasm --networkId testnet
-```
-
-### 4️⃣ Interact with your Contract
-
-```bash
-# Call view methods (free)
+# Call a view method (free, no gas needed)
 near view your-contract.testnet get_greeting
 
-# Call methods that change state (costs gas)
-near call your-contract.testnet set_greeting '{"message":"Hello from CLI"}' --accountId your-account.testnet
+# Call a change method (requires gas)
+near call your-contract.testnet set_greeting '{"message":"Hello, NEAR!"}' --accountId your-account.testnet
 ```
 
 ## 📚 SDK Components
 
-### Storage API
+### Contract Base Class
+
+All contracts inherit from the `Contract` class, which provides:
 
 ```python
-# Store values in different formats
-Storage.set("key", "value")                  # String value
-Storage.set_json("config", {"active": True}) # Any JSON-serializable value
+from near_sdk_py import Contract, call, view
 
-# Retrieve stored values 
-value = Storage.get_string("key")           # As string
-config = Storage.get_json("config")         # As Python object
-
-# Manage storage
-exists = Storage.has("key")                 # Check if key exists
-Storage.remove("key")                       # Delete a key
+class MyContract(Contract):
+    @init
+    def initialize(self):
+        self.storage["owner"] = self.predecessor_account_id
+        
+    @view
+    def get_status(self):
+        # Access context properties directly
+        return {
+            "contract_id": self.current_account_id,
+            "caller": self.predecessor_account_id,
+            "owner": self.storage.get("owner"),
+            "block_height": self.block_height,
+            "timestamp": self.block_timestamp
+        }
+    
+    @call
+    def update_config(self, key, value):
+        # Simple validation
+        self.assert_owner()
+        
+        # Use dict-like storage access
+        self.storage[key] = value
+        
+        # Easy logging
+        self.log_event("config_updated", {"key": key})
+        return {"success": True}
 ```
 
-### Context Information
+### Storage Interface
+
+The storage interface is now more Pythonic with dictionary-like access:
+
+```python
+# Store values with dict syntax
+self.storage["key"] = "value"                # String value
+self.storage["config"] = {"active": True}    # Any JSON-serializable value
+
+# Retrieve values with easy defaults 
+value = self.storage.get("key", "default")   # With default
+config = self.storage["config"]              # Direct access
+
+# Check for keys
+if "owner" in self.storage:
+    # Do something
+    
+# Delete keys
+del self.storage["old_key"]
+```
+
+### Context Properties
+
+Access blockchain context directly as properties:
 
 ```python
 # Account information
-account_id = Context.current_account_id()    # This contract's account
-caller = Context.predecessor_account_id()    # Who called this function
-signer = Context.signer_account_id()         # Who signed the transaction
+account_id = self.current_account_id      # This contract's account
+caller = self.predecessor_account_id      # Who called this function
+signer = self.signer_account_id           # Who signed the transaction
 
 # Transaction details
-deposit = Context.attached_deposit()         # NEAR tokens attached
-gas = Context.prepaid_gas()                  # Gas allocated to this call
+deposit = self.attached_deposit           # NEAR tokens attached
+gas = self.prepaid_gas                    # Gas allocated to this call
 
 # Blockchain state 
-height = Context.block_height()              # Current block height
-timestamp = Context.block_timestamp()        # Current block timestamp
+height = self.block_height                # Current block height
+timestamp = self.block_timestamp          # Current block timestamp
 ```
 
-### Logging
+### Logging Helpers
 
 ```python
 # Simple logging
-Log.info("Operation completed successfully")
-Log.warning("Approaching storage limit")
-Log.error("Transaction failed: insufficient deposit")
+self.log_info("Operation completed successfully")
+self.log_warning("Approaching storage limit")
+self.log_error("Transaction failed: insufficient deposit")
 
 # NEP-standard event logging 
-Log.event("nft_mint", {
+self.log_event("nft_mint", {
     "token_id": "token-123",
     "owner_id": "alice.near",
     "memo": "Happy birthday!"
 })
 ```
 
-## Cross-Contract Calls with Promises API
+## Exception Handling
+
+Use native Python exceptions for error handling:
+
+```python
+from near_sdk_py import Contract, call, InvalidInput, AccessDenied
+
+class MyContract(Contract):
+    @call
+    def restricted_method(self):
+        if self.predecessor_account_id != self.storage.get("owner"):
+            raise AccessDenied("Only the owner can call this method")
+            
+        if self.attached_deposit < self.storage.get("min_deposit", 0):
+            raise InvalidInput("Insufficient deposit")
+            
+        try:
+            # Do something that might fail
+            result = some_operation()
+        except Exception as e:
+            raise ContractError(f"Operation failed: {e}")
+```
+
+## 🔄 Cross-Contract Calls
 
 The SDK provides a powerful Promises API for making cross-contract calls with elegant method chaining:
 
 ```python
-from near_sdk_py import call, callback, Contract, PromiseResult
+from near_sdk_py import call, callback, CrossContract, PromiseResult
 
-class CrossContractExample:
+class CrossContractExample(Contract):
     @call
     def get_token_balance(self, token_contract_id: str, account_id: str):
         # Create a contract instance and chain the operations
         promise = (
-            Contract(token_contract_id)
+            CrossContract(token_contract_id)
             .call("ft_balance_of", account_id=account_id)
             .then("process_balance", account_id=account_id)
             .value()
         )
-        
         return promise
     
     @callback
@@ -189,39 +203,120 @@ class CrossContractExample:
         if result.success:
             return {
                 "account_id": account_id,
-                "balance": result.data,
-                "formatted_balance": f"{int(result.data) / 10**24:.2f} NEAR"
+                "balance": result.data
             }
         else:
-            return {"success": False, "error": "Failed to get balance"}
+            return {
+                "account_id": account_id,
+                "error": "Failed to retrieve balance"
+            }
 ```
 
 Key features of the Promises API:
-- **Intuitive interface** with method chaining
-- **Callback decorators** for easy result handling
-- **Batch operations** for multiple actions in one transaction
-- **Account operations** like creating subaccounts and managing access keys
-- **Comprehensive error handling** for robust cross-contract interactions
 
-[Read the Promises API documentation →](docs/promises/)
+- Fluent interface for chaining operations
+- Automatic callback registration
+- Promise result handling
+- Support for batch operations
+
+[Read the Promises documentation →](docs/promises/)
 
 ## 🔐 Security Best Practices
 
+The `Contract` class provides built-in validation helpers:
+
 ```python
-from near_sdk_py import call, BaseContract, ONE_NEAR
+from near_sdk_py import call, ONE_NEAR
 
-# Require exactly 1 yoctoNEAR to prove key ownership
-@call
-def transfer_ownership(self, new_owner):
-    BaseContract.assert_one_yocto()  # Ensures tx is signed (non-delegated)
-    # Implementation...
-
-# Require minimum deposit for a function
-@call
-def place_bid(self, token_id):
-    BaseContract.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
-    # Implementation...
+class SecureContract(Contract):
+    @call
+    def transfer_ownership(self, new_owner):
+        self.assert_one_yocto()  # Ensures tx is signed (non-delegated)
+        self.assert_owner()      # Verifies caller is the owner
+        # Implementation...
+    
+    @call
+    def place_bid(self, token_id):
+        self.assert_min_deposit(ONE_NEAR)  # At least 1 NEAR required
+        # Implementation...
 ```
+## 🧪 Testing with near-pytest
+
+The NEAR Python SDK works seamlessly with [near-pytest](https://github.com/r-near/near-pytest/), a pytest-native framework for testing NEAR smart contracts. Together, they provide a powerful toolchain for developing and testing contracts.
+
+### Key Features of near-pytest
+
+- **Zero-config setup** - Automatic sandbox management, contract compilation, and account creation
+- **Lightning-fast tests** - State snapshots between tests make test suites run significantly faster
+- **Intuitive API** - Simple, Pythonic interfaces for interacting with contracts and accounts
+
+### Example Test Setup
+
+```python
+from near_pytest.testing import NearTestCase
+
+class TestGreetingContract(NearTestCase):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+        
+        # Compile the contract
+        wasm_path = cls.compile_contract(
+            "contracts/greeting.py", 
+            single_file=True
+        )
+        
+        # Deploy the contract
+        cls.contract_account = cls.create_account("contract")
+        cls.instance = cls.deploy_contract(cls.contract_account, wasm_path)
+        
+        # Create test user
+        cls.user = cls.create_account("user")
+        
+        # Save state for future resets - this is crucial for performance
+        cls.save_state()
+    
+    def setup_method(self):
+        # Reset to initial state before each test method
+        # This makes tests run much faster than re-deploying
+        self.reset_state()
+        
+    def test_greeting(self):
+        # Set greeting as user
+        result = self.instance.call_as(
+            account=self.user,
+            method_name="set_greeting",
+            args={"message": "Hello, tests!"}
+        )
+        result = json.loads(result)
+        assert result["success"] == True
+        
+        # Get greeting
+        greeting = self.instance.call_as(
+            account=self.user,
+            method_name="get_greeting"
+        )
+        assert greeting == "Hello, tests!"
+```
+
+### Running Tests
+
+Simply run with pytest:
+
+```bash
+pytest test_greeting_contract.py -v
+```
+
+### State Management in Tests
+
+The state management pattern (save_state/reset_state) is what makes near-pytest tests run significantly faster than traditional approaches. Rather than re-deploying contracts and recreating accounts for each test, it:
+
+1. Sets up the full environment once in `setup_class` 
+2. Takes a snapshot of the blockchain state
+3. Quickly resets to this snapshot before each test
+
+This approach can make test suites run orders of magnitude faster, especially as your test suite grows.
+
 
 ## 📊 Example Projects
 
@@ -234,9 +329,9 @@ The SDK includes starter templates for common contract types:
 
 ## 📈 Performance Considerations
 
-- Use `Storage.get_json()` for complex data instead of parsing manually
 - Group related data in a single storage entry to reduce calls
 - Implement pagination for methods that return large collections
+- For collections, use the SDK's storage primitives which are optimized for gas efficiency
 
 ## 🤝 Contributing
 

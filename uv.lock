@@ -514,7 +514,7 @@ wheels = [
 
 [[package]]
 name = "near-abi-py"
-version = "0.3.0"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -522,14 +522,14 @@ dependencies = [
     { name = "pathspec" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ff/63/4852e072a0a06fbfdaa3dcb782c077b4a5535a3ae9c1be7dacb4898e3096/near_abi_py-0.3.0.tar.gz", hash = "sha256:4a87fcb4cb9d31bd893968929fea44158e3990cd8a3053d8b986db58b0bf07d4", size = 60071 }
+sdist = { url = "https://files.pythonhosted.org/packages/33/ca/ec894963a188cf492b7098bc58f9cd737550a74c2846ffc4a56731574c3a/near_abi_py-0.4.0.tar.gz", hash = "sha256:fa668c9537b3adbb048a4154da60a5e752b29479c69012ffdfbac49fc24ae63d", size = 60448 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/c4/d3fa57da465555d96e1f7d8e22fdda5bad9496e36270fda50f6954633dba/near_abi_py-0.3.0-py3-none-any.whl", hash = "sha256:3a877d9caa2de4e1f9e4005d483d55d6005681ce90d492fe7960a9ea7b24ba09", size = 23614 },
+    { url = "https://files.pythonhosted.org/packages/42/d1/fdf52f281b2b3f96acd7c273c70681b8ef1483e77937752939ef21632343/near_abi_py-0.4.0-py3-none-any.whl", hash = "sha256:5ffd645fbd7d8117c52f6c4a8a16eb0ac8fd93537bd6dc6a468689eaaf05a7a5", size = 23638 },
 ]
 
 [[package]]
 name = "near-pytest"
-version = "0.5.2"
+version = "0.5.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "base58" },
@@ -539,9 +539,9 @@ dependencies = [
     { name = "pytest" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bb/70/b51c28496a30cb7298c6b6cd5effcf2171299603261985c6d7077af2e1d5/near_pytest-0.5.2.tar.gz", hash = "sha256:f02a295d8f15fb0f484746f31d5d119704c0474a76255982f947d1eae5b7db0f", size = 65172 }
+sdist = { url = "https://files.pythonhosted.org/packages/6e/fc/c8022e5d2ac9b6deceafdf1e9dd1de447c46dfdc6c47c611cb294b51d315/near_pytest-0.5.4.tar.gz", hash = "sha256:4ca02ce934119647a4fde2dce38785dcd59819b7c63b9687d415e14c886f6069", size = 65653 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/d3/3680b97e9fda2e6db867bebccc9bd4bb7e6f2909066eb739d7140f2570e5/near_pytest-0.5.2-py3-none-any.whl", hash = "sha256:43e7d17ce3c8906127064e99d38812f6a69b8c19fe85740db60ede0d3bcf9114", size = 16880 },
+    { url = "https://files.pythonhosted.org/packages/d1/77/a1c592dbe2e791ac30238ce408a19913e96dde945f7da86d5721e7f3c910/near_pytest-0.5.4-py3-none-any.whl", hash = "sha256:b0693377be91acf792b7106e49207e6b33ac19cd342f601f2af46b4a2075eb29", size = 16876 },
 ]
 
 [[package]]
@@ -564,7 +564,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
-    { name = "near-pytest", specifier = ">=0.5.2" },
+    { name = "near-pytest", specifier = ">=0.5.4" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
@@ -573,7 +573,7 @@ dev = [
 
 [[package]]
 name = "nearc"
-version = "0.7.2"
+version = "0.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "near-abi-py" },
@@ -585,9 +585,9 @@ dependencies = [
     { name = "types-zstd" },
     { name = "zstd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/54/8e/d29a20d60dabed9625ff3a371ac0e2ceb328b4e86a45a4e099c076f84ba3/nearc-0.7.2.tar.gz", hash = "sha256:0ea394a39c50f53c57d7c8b3f94b7dc9df3fecb638ec24bc70c465d871c5af69", size = 8355588 }
+sdist = { url = "https://files.pythonhosted.org/packages/22/a3/6b35ab704551207b2d0e4dd086e346db22420b52d22548f78ecc172d08a9/nearc-0.8.1.tar.gz", hash = "sha256:3778f55c02c69b8f6d052c7bd286e2851732f1c229b917792896a1a365daa3b1", size = 8356453 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8b/54/cb3b1dbf0aa9e044e9448b0d4fcc7cfb7000b44304ba070660935f77f57d/nearc-0.7.2-py3-none-any.whl", hash = "sha256:948db97fed887e24e7a7b3623a25c8c2ee3413bdb5567f083f8553639f0c94b5", size = 11593796 },
+    { url = "https://files.pythonhosted.org/packages/7f/df/96a1e9c272ff55233ef1bddb7eebb46ac862937e1e63e56cc763be999c51/nearc-0.8.1-py3-none-any.whl", hash = "sha256:59b769a1c92a429d1f9f3461014c8b48a17eb1c7e2c8ecdb7f9fc6d3f547c312", size = 11595689 },
 ]
 
 [[package]]
