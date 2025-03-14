@@ -8,7 +8,7 @@ This contract demonstrates callback patterns with NEAR Promises:
 """
 
 from near_sdk_py import call, view, Storage, Log
-from near_sdk_py.promises import Contract, callback, multi_callback, PromiseResult
+from near_sdk_py.promises import CrossContract, callback, multi_callback, PromiseResult
 from near_sdk_py import ONE_TGAS
 from typing import List
 
@@ -38,7 +38,7 @@ class CallbackContract:
             contract_id: ID of the contract to call
             key: Storage key to retrieve from the other contract
         """
-        contract = Contract(contract_id, gas=10 * ONE_TGAS)
+        contract = CrossContract(contract_id, gas=10 * ONE_TGAS)
 
         # Call get_value on the other contract
         promise = contract.call("get_value", key=key)
@@ -82,11 +82,11 @@ class CallbackContract:
             key2: Key to retrieve from second contract
         """
         # Create first promise to get value from contract1
-        contract1 = Contract(contract_id1)
+        contract1 = CrossContract(contract_id1)
         promise1 = contract1.call("get_value", key=key1)
 
         # Create second promise to get value from contract2
-        contract2 = Contract(contract_id2)
+        contract2 = CrossContract(contract_id2)
         promise2 = contract2.call("get_value", key=key2)
 
         # Join the promises and add a callback
@@ -141,7 +141,7 @@ class CallbackContract:
             key2: Key to retrieve from second contract
         """
         # Create the first contract
-        contract1 = Contract(contract_id1)
+        contract1 = CrossContract(contract_id1)
 
         # Start the chain by calling the first contract
         promise1 = contract1.call("get_value", key=key1)
@@ -172,7 +172,7 @@ class CallbackContract:
         first_value = result.data
 
         # Create a contract object for the second call
-        contract2 = Contract(second_contract)
+        contract2 = CrossContract(second_contract)
 
         # Make the second call
         promise2 = contract2.call("get_value", key=key2)
@@ -199,18 +199,3 @@ class CallbackContract:
             "original_value": original_value,
             "chained_value": result.data,
         }
-
-
-# Create an instance and export the methods
-contract = CallbackContract()
-
-# Export contract methods
-get_value = contract.get_value
-set_value = contract.set_value
-call_with_callback = contract.call_with_callback
-process_callback = contract.process_callback
-join_promises = contract.join_promises
-process_join_callback = contract.process_join_callback
-chain_calls = contract.chain_calls
-process_first_call = contract.process_first_call
-process_second_call = contract.process_second_call

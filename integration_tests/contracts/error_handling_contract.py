@@ -8,7 +8,7 @@ This contract demonstrates error handling patterns with NEAR Promises:
 """
 
 from near_sdk_py import call, view, Storage, Log
-from near_sdk_py.promises import Contract, callback, PromiseResult
+from near_sdk_py.promises import CrossContract, callback, PromiseResult
 from near_sdk_py import ONE_TGAS
 
 
@@ -38,7 +38,7 @@ class ErrorHandlingContract:
         Log.info("Starting call to nonexistent method")
 
         # Create a contract object with enough gas
-        contract = Contract(contract_id, gas=100 * ONE_TGAS)
+        contract = CrossContract(contract_id, gas=100 * ONE_TGAS)
 
         # Call a method that doesn't exist on the target contract
         promise = contract.call("this_method_does_not_exist")
@@ -86,7 +86,7 @@ class ErrorHandlingContract:
             key: Storage key to retrieve
         """
         # Try the primary contract first
-        contract = Contract(primary_contract_id, gas=30 * ONE_TGAS)
+        contract = CrossContract(primary_contract_id, gas=30 * ONE_TGAS)
         promise = contract.call("get_value", key=key)
 
         # Add callback that will check the result and potentially use the fallback
@@ -113,7 +113,7 @@ class ErrorHandlingContract:
 
         # Primary call failed, try the fallback
         Log.info("Primary call failed, using fallback contract")
-        fallback_contract = Contract(fallback_contract_id)
+        fallback_contract = CrossContract(fallback_contract_id)
         fallback_promise = fallback_contract.call("get_value", key=key)
 
         # Add another callback to process the fallback result
@@ -148,7 +148,7 @@ class ErrorHandlingContract:
             key: Storage key to retrieve
             min_length: Minimum length for the value to be processed
         """
-        contract = Contract(contract_id, gas=20 * ONE_TGAS)
+        contract = CrossContract(contract_id, gas=20 * ONE_TGAS)
         promise = contract.call("get_value", key=key)
 
         # Chain a callback that will check the criteria
@@ -187,18 +187,3 @@ class ErrorHandlingContract:
                 "meets_criteria": False,
                 "error": f"Value length {len(value)} is less than required {min_length}",
             }
-
-
-# Create an instance and export the methods
-contract = ErrorHandlingContract()
-
-# Export contract methods
-get_value = contract.get_value
-set_value = contract.set_value
-call_nonexistent_method = contract.call_nonexistent_method
-handle_error = contract.handle_error
-call_with_fallback = contract.call_with_fallback
-process_with_fallback = contract.process_with_fallback
-process_fallback_result = contract.process_fallback_result
-conditional_callback = contract.conditional_callback
-check_result_criteria = contract.check_result_criteria

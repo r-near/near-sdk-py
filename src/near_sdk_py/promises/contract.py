@@ -1,11 +1,11 @@
 import near
+import json
 from near_sdk_py.constants import ONE_TGAS
-from near_sdk_py.cross_contract import CrossContract
 from .promise import Promise
 from .batch import PromiseBatch
 
 
-class Contract:
+class CrossContract:
     """Fluent interface for calling contract methods."""
 
     def __init__(self, account_id: str, gas: int = 10 * ONE_TGAS, deposit: int = 0):
@@ -21,7 +21,7 @@ class Contract:
         self._gas = gas
         self._deposit = deposit
 
-    def gas(self, amount: int) -> "Contract":
+    def gas(self, amount: int) -> "CrossContract":
         """
         Set the default gas amount for calls to this contract.
 
@@ -29,11 +29,11 @@ class Contract:
             amount: Gas amount in gas units
 
         Returns:
-            A new Contract with updated gas setting
+            A new CrossContract with updated gas setting
         """
-        return Contract(self.account_id, gas=amount, deposit=self._deposit)
+        return CrossContract(self.account_id, gas=amount, deposit=self._deposit)
 
-    def deposit(self, amount: int) -> "Contract":
+    def deposit(self, amount: int) -> "CrossContract":
         """
         Set the default deposit amount for calls to this contract.
 
@@ -41,9 +41,9 @@ class Contract:
             amount: Deposit amount in yoctoNEAR
 
         Returns:
-            A new Contract with updated deposit setting
+            A new CrossContract with updated deposit setting
         """
-        return Contract(self.account_id, gas=self._gas, deposit=amount)
+        return CrossContract(self.account_id, gas=self._gas, deposit=amount)
 
     def call(self, method: str, **kwargs) -> Promise:
         """
@@ -56,12 +56,15 @@ class Contract:
         Returns:
             A Promise object representing the call
         """
-        promise_id = CrossContract.call(
-            account_id=self.account_id,
-            method_name=method,
-            args=kwargs,
-            amount=self._deposit,
-            gas=self._gas,
+        if kwargs is None:
+            args_str = ""
+        elif isinstance(kwargs, str):
+            args_str = kwargs
+        else:
+            args_str = json.dumps(kwargs)
+
+        promise_id = near.promise_create(
+            self.account_id, method, args_str, self._deposit, self._gas
         )
 
         return Promise(promise_id, gas=self._gas)

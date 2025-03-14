@@ -6,14 +6,14 @@ cross-contract calls with method chaining and modern Python syntax.
 """
 
 from .batch import BatchAction, PromiseBatch
-from .contract import Contract
+from .contract import CrossContract
 from .promise import Promise, PromiseResult
 from .decorators import callback, multi_callback
 
 __all__ = [
     "BatchAction",
     "PromiseBatch",
-    "Contract",
+    "CrossContract",
     "Promise",
     "PromiseResult",
     "callback",

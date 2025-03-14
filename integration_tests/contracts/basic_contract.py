@@ -8,7 +8,7 @@ This contract demonstrates the simplest forms of Promise usage:
 """
 
 from near_sdk_py import call, view, Storage
-from near_sdk_py.promises import Contract
+from near_sdk_py.promises import CrossContract
 
 
 class BasicContract:
@@ -32,7 +32,7 @@ class BasicContract:
         This is the simplest possible cross-contract call pattern,
         which directly returns the promise result to the caller.
         """
-        contract = Contract(contract_id)
+        contract = CrossContract(contract_id)
         # Call get_value and return the promise directly
         return contract.call("get_value", key=key).value()
 
@@ -43,13 +43,3 @@ class BasicContract:
         Useful for testing gas usage of a basic call.
         """
         return message
-
-
-# Create an instance and export the methods
-contract = BasicContract()
-
-# Export contract methods
-get_value = contract.get_value
-set_value = contract.set_value
-direct_call = contract.direct_call
-echo = contract.echo

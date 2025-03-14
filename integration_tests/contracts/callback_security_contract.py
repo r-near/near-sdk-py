@@ -8,7 +8,7 @@ This contract includes methods to test:
 """
 
 from near_sdk_py import call, view, Storage, Context, Log
-from near_sdk_py.promises import Contract, callback, PromiseResult
+from near_sdk_py.promises import CrossContract, callback, PromiseResult
 from near_sdk_py import ONE_TGAS
 
 
@@ -38,7 +38,7 @@ class CallbackSecurityContract:
         Log.info(f"Current account: {current_account}")
 
         # Create a contract object (to self)
-        contract = Contract(current_account, gas=10 * ONE_TGAS)
+        contract = CrossContract(current_account, gas=10 * ONE_TGAS)
 
         # Call get_value on self
         promise = contract.call("get_value", key=key)
@@ -74,7 +74,7 @@ class CallbackSecurityContract:
         from calling callbacks directly.
         """
         # Create a contract object
-        other_contract = Contract(target_contract, gas=10 * ONE_TGAS)
+        other_contract = CrossContract(target_contract, gas=10 * ONE_TGAS)
 
         # Attempt to call the callback directly
         promise = other_contract.call("process_callback", key="some_key")
@@ -95,7 +95,7 @@ class CallbackSecurityContract:
         current_account = Context.current_account_id()
 
         # Call get_value on self
-        contract = Contract(current_account, gas=50 * ONE_TGAS)
+        contract = CrossContract(current_account, gas=50 * ONE_TGAS)
         promise = contract.call("get_value", key="test_key")
 
         # Chain a callback that will try to call the other contract's callback
@@ -115,23 +115,10 @@ class CallbackSecurityContract:
         Log.info(f"In try_external_callback, calling {target_contract}'s callback")
 
         # Create a contract object for the target contract
-        other_contract = Contract(target_contract, gas=20 * ONE_TGAS)
+        other_contract = CrossContract(target_contract, gas=20 * ONE_TGAS)
 
         # Try to call the other contract's callback
         promise = other_contract.call("process_callback", key="from_callback_context")
 
         # Return the promise result
         return promise.value()
-
-
-# Create an instance and export the methods
-contract = CallbackSecurityContract()
-
-# Export contract methods
-get_value = contract.get_value
-set_value = contract.set_value
-self_call_with_callback = contract.self_call_with_callback
-process_callback = contract.process_callback
-external_callback_call = contract.external_callback_call
-create_fake_callback_context = contract.create_fake_callback_context
-try_external_callback = contract.try_external_callback
