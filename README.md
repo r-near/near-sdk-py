@@ -42,27 +42,22 @@ pip install near-sdk-py
 ### 1️⃣ Create Your Contract
 
 ```python
-from near_sdk_py import view, call, init, Context, Storage, Log
+from near_sdk_py import Contract, view, call, init
 
 class GreetingContract(Contract):
     @init
-    def new(self, owner_id=None):
-        """Initialize the contract with optional owner"""
-        owner = owner_id or self.predecessor_account_id
-        self.storage["owner"] = owner
-        self.log_info(f"Contract initialized by {owner}")
-        return True
-    
-    @call
-    def set_greeting(self, message):
-        """Store a greeting message (requires gas)"""
-        self.storage["greeting"] = message
-        return f"Greeting updated to: {message}"
+    def initialize(self, default_message="Hello"):
+        self.storage["greeting"] = default_message
+        return {"success": True}
     
     @view
     def get_greeting(self):
-        """Retrieve the greeting message (free, no gas needed)"""
-        return self.storage.get("greeting", "Hello, NEAR world!")
+        return self.storage.get("greeting", "Hello, world!")
+    
+    @call
+    def set_greeting(self, message):
+        self.storage["greeting"] = message
+        return {"success": True}
 ```
 
 ### 2️⃣ Build and Deploy
