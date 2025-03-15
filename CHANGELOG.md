@@ -1,6 +1,125 @@
 # CHANGELOG
 
 
+## v0.5.0 (2025-03-15)
+
+### Bug Fixes
+
+- **ci**: New release
+  ([`9decce5`](https://github.com/r-near/near-sdk-py/commit/9decce5abca63e4fb31330423a0f3c7ecbaa5707))
+
+- **ci**: New release
+  ([`e143133`](https://github.com/r-near/near-sdk-py/commit/e1431338061f12296629a85ff2befdfe87d5f411))
+
+- **ci**: Release process
+  ([`e43eeaf`](https://github.com/r-near/near-sdk-py/commit/e43eeafd05bdf54be0772e330aaf86d97d651d82))
+
+- **near**: Add missing low-level APIs ([#17](https://github.com/r-near/near-sdk-py/pull/17),
+  [`7dd01de`](https://github.com/r-near/near-sdk-py/commit/7dd01def8339ff58356bc66f96540c94c143dc6a))
+
+### Chores
+
+- **deps**: Create dependabot.yml
+  ([`fe97dcf`](https://github.com/r-near/near-sdk-py/commit/fe97dcfafb103c6e9de5dcf9ca56daa7f8a8592e))
+
+### Documentation
+
+- Minor updates
+  ([`78a9d7c`](https://github.com/r-near/near-sdk-py/commit/78a9d7c3fb48118435a66d5fc2ab3ba06f537718))
+
+### Features
+
+- Introduce Class-Based Contract Pattern ([#19](https://github.com/r-near/near-sdk-py/pull/19),
+  [`275883c`](https://github.com/r-near/near-sdk-py/commit/275883c2988aa4371dd869c2bb54108858104a67))
+
+* Improved ergonomics
+
+* Slight changes to the README
+
+* docs
+
+* Update README
+
+* clean this up
+
+* Update docs
+
+* Add greeting contract test
+
+* add ownership test
+
+* Add storage tests
+
+- Pythonic Promise API for Cross-Contract Calls ([#5](https://github.com/r-near/near-sdk-py/pull/5),
+  [`ed4b509`](https://github.com/r-near/near-sdk-py/commit/ed4b50945d6ba91f82c7aca7ac0da68d9a4379ec))
+
+* First attempt at promises
+
+* Parse extra args
+
+* documentation
+
+* Make this a private function
+
+* Split into modules
+
+* Apparently needs to be borsh-serialized
+
+* Add tests for batch
+
+* feat: Add tests CI
+
+* Fix deps
+
+* fix(ci): Install Python properly
+
+* Remove this from the lint action
+
+* Update near-pytest
+
+* Add more tests
+
+* Parallel tests, proper test isolation
+
+* simplify dependencies
+
+* Test join promises
+
+* Test promise chain
+
+* test promise failures
+
+* batch promises
+
+* batch test
+
+* update to latest pytest
+
+* Increase gas
+
+* Add basic contract
+
+* Add callback contract
+
+* Logging
+
+* error handling
+
+* token gas
+
+* account operations
+
+* delete old contracts
+
+* docs
+
+* Add security check
+
+* Linting
+
+* Maybe no parallelization for now
+
+
 ## v0.4.1 (2025-03-06)
 
 ### Bug Fixes
