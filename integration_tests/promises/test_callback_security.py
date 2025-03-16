@@ -12,8 +12,9 @@ The tests include:
 - A more complex test with a fake callback context (testing specifically the self-call check)
 """
 
-from near_pytest.testing import NearTestCase
 import json
+
+from near_pytest.testing import NearTestCase
 
 
 class TestCallbackSecurity(NearTestCase):

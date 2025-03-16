@@ -7,7 +7,6 @@ from typing import Dict, Optional
 
 import pytest
 
-
 # Mock storage - this will simulate the blockchain storage
 mock_storage: Dict[str, bytes] = {}
 

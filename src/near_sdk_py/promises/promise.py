@@ -5,11 +5,12 @@ This module provides a more intuitive, Pythonic interface for NEAR's
 cross-contract calls with method chaining and modern Python syntax.
 """
 
+import json
 from typing import List, TypeVar
 
 import near
-import json
 from near_sdk_py.constants import ONE_TGAS
+
 from .batch import PromiseBatch
 
 T = TypeVar("T")

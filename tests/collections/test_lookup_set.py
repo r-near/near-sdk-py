@@ -4,9 +4,10 @@ Unit tests for LookupSet collection.
 
 import pytest
 
+from near_sdk_py.collections.adapter import CollectionStorageAdapter
+
 # Import the collection we want to test
 from near_sdk_py.collections.lookup_set import LookupSet
-from near_sdk_py.collections.adapter import CollectionStorageAdapter
 
 
 def test_lookup_set_basics(setup_storage_mocks):

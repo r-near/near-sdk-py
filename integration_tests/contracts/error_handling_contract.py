@@ -7,9 +7,8 @@ This contract demonstrates error handling patterns with NEAR Promises:
 - Graceful error handling in callbacks
 """
 
-from near_sdk_py import call, view, Storage, Log
-from near_sdk_py.promises import CrossContract, callback, PromiseResult
-from near_sdk_py import ONE_TGAS
+from near_sdk_py import ONE_TGAS, Log, Storage, call, view
+from near_sdk_py.promises import CrossContract, PromiseResult, callback
 
 
 class ErrorHandlingContract:

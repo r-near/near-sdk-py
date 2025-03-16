@@ -10,9 +10,10 @@ This module demonstrates complex account operations with NEAR's Promises API:
 These examples show how to perform advanced operations with promises.
 """
 
-from near_pytest.testing import NearTestCase
 import json
 import secrets
+
+from near_pytest.testing import NearTestCase
 
 
 class TestAccountOperations(NearTestCase):

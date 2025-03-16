@@ -1,5 +1,6 @@
-from near_pytest import NearTestCase
 import json
+
+from near_pytest import NearTestCase
 
 
 class TestStorageContract(NearTestCase):

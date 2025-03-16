@@ -10,8 +10,9 @@ This module demonstrates how to manage tokens and gas with NEAR's Promises API:
 These examples show how to work with NEAR's economic model in promises.
 """
 
-from near_pytest.testing import NearTestCase
 import json
+
+from near_pytest.testing import NearTestCase
 
 
 class TestTokenGasManagement(NearTestCase):

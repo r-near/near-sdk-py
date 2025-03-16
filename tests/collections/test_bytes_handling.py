@@ -2,9 +2,9 @@
 Tests for handling bytes objects in the collections.
 """
 
-from near_sdk_py.collections.vector import Vector
 from near_sdk_py.collections.lookup_map import LookupMap
 from near_sdk_py.collections.unordered_map import UnorderedMap
+from near_sdk_py.collections.vector import Vector
 
 
 def test_bytes_in_vector(setup_storage_mocks, dump_storage):

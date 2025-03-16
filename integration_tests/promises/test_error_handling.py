@@ -10,8 +10,9 @@ These examples show how to build robust cross-contract interactions
 that can handle failure cases gracefully.
 """
 
-from near_pytest.testing import NearTestCase
 import json
+
+from near_pytest.testing import NearTestCase
 
 
 class TestPromiseErrorHandling(NearTestCase):

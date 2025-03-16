@@ -2,13 +2,15 @@
 Decorator utilities for NEAR smart contracts.
 """
 
+import json
+from functools import wraps
+
 import near
+
+from .contract import ContractError, ContractPanic
 from .input import Input
 from .log import Log
-import json
 from .value_return import ValueReturn
-from .contract import ContractPanic, ContractError
-from functools import wraps
 
 
 def contract_method(func):

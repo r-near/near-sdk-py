@@ -7,10 +7,10 @@ This contract demonstrates how to:
 - Transfer tokens between accounts
 """
 
-from near_sdk_py import call, view, Storage, Context, Log
-from near_sdk_py.promises import CrossContract, callback, PromiseResult
-from near_sdk_py import ONE_TGAS
 from typing import Optional
+
+from near_sdk_py import ONE_TGAS, Context, Log, Storage, call, view
+from near_sdk_py.promises import CrossContract, PromiseResult, callback
 
 
 class TokenGasContract:
