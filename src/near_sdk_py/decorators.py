@@ -5,6 +5,7 @@ Decorator utilities for NEAR smart contracts.
 import near
 from .input import Input
 from .log import Log
+import json
 from .value_return import ValueReturn
 from .contract import ContractPanic, ContractError
 from functools import wraps
@@ -21,13 +22,14 @@ def contract_method(func):
             # If no kwargs were provided and this appears to be a blockchain call
             if len(kwargs) == 0 and len(args) <= 1:
                 try:
-                    # Parse input JSON and use it as kwargs
-                    input_json = Input.json()
-                    if isinstance(input_json, dict):
-                        kwargs = input_json
+                    data = Input.string()
+                    if len(data) > 0:
+                        # Try parsing it as JSON
+                        kwargs = json.loads(data)
                 except Exception as e:
-                    # Log but don't fail - method might not need input
+                    # Don't panic, but we might want to log this
                     Log.warning(f"Failed to parse input as JSON: {e}")
+                    pass
 
             # Call the actual function
             result = func(*args, **kwargs)
