@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.5.2 (2025-03-16)
+
+### Bug Fixes
+
+- **lint**: Sort imports ([#22](https://github.com/r-near/near-sdk-py/pull/22),
+  [`d7ed229`](https://github.com/r-near/near-sdk-py/commit/d7ed229a89c200a2ea1f4b8d3c4d1561a1c12622))
+
+
 ## v0.5.1 (2025-03-16)
 
 ### Bug Fixes
