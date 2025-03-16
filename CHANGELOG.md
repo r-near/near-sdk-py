@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.5.1 (2025-03-16)
+
+### Bug Fixes
+
+- Warning message for empty args ([#21](https://github.com/r-near/near-sdk-py/pull/21),
+  [`ec3b7a5`](https://github.com/r-near/near-sdk-py/commit/ec3b7a5f0f9c32635bc5083d1480656381a97f4d))
+
+
 ## v0.5.0 (2025-03-15)
 
 ### Bug Fixes
