@@ -8,10 +8,10 @@ This contract demonstrates complex Promise patterns with batch operations:
 - Executing complex multi-operation sequences
 """
 
-from near_sdk_py import call, view, Storage, Context, Log
-from near_sdk_py.promises import Promise, callback, PromiseResult
-from near_sdk_py import ONE_TGAS, ONE_NEAR
 from typing import Optional
+
+from near_sdk_py import ONE_NEAR, ONE_TGAS, Context, Log, Storage, call, view
+from near_sdk_py.promises import Promise, PromiseResult, callback
 
 
 class AccountOperationsContract:

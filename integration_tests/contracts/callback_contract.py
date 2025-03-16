@@ -7,10 +7,10 @@ This contract demonstrates callback patterns with NEAR Promises:
 - Data passing between promises in a chain
 """
 
-from near_sdk_py import call, view, Storage, Log
-from near_sdk_py.promises import CrossContract, callback, multi_callback, PromiseResult
-from near_sdk_py import ONE_TGAS
 from typing import List
+
+from near_sdk_py import ONE_TGAS, Log, Storage, call, view
+from near_sdk_py.promises import CrossContract, PromiseResult, callback, multi_callback
 
 
 class CallbackContract:

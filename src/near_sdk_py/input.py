@@ -4,9 +4,10 @@ Input handling utilities for NEAR smart contracts.
 
 import json
 from typing import Any
-from .contract import InvalidInput
 
 import near
+
+from .contract import InvalidInput
 
 
 class Input:

@@ -5,16 +5,18 @@ This script measures storage units used by different collection operations,
 which directly corresponds to gas costs in NEAR smart contracts.
 """
 
+from typing import Dict, Tuple
+
 from rich.console import Console
 from rich.table import Table
-from typing import Dict, Tuple
+
+from near_sdk_py.collections.lookup_map import LookupMap
+from near_sdk_py.collections.lookup_set import LookupSet
+from near_sdk_py.collections.tree_map import TreeMap
+from near_sdk_py.collections.unordered_map import UnorderedMap
 
 # Import collections
 from near_sdk_py.collections.vector import Vector
-from near_sdk_py.collections.lookup_map import LookupMap
-from near_sdk_py.collections.lookup_set import LookupSet
-from near_sdk_py.collections.unordered_map import UnorderedMap
-from near_sdk_py.collections.tree_map import TreeMap
 
 
 def calculate_storage_size(storage_dict: Dict[str, bytes]) -> int:

@@ -5,7 +5,7 @@ This module provides functions for interacting with the persistent on-chain stor
 of a NEAR smart contract.
 """
 
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
 
 def storage_write(key: Union[bytes, str], value: Union[bytes, str]) -> Optional[bytes]:

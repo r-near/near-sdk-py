@@ -47,15 +47,15 @@ class TokenContract:
 ```
 """
 
-from .base import Collection, PrefixType
 from .adapter import CollectionStorageAdapter
-from .vector import Vector
+from .base import Collection, PrefixType
 from .lookup_map import LookupMap
-from .unordered_map import UnorderedMap, IterableMap
 from .lookup_set import LookupSet
-from .unordered_set import UnorderedSet, IterableSet
 from .tree_map import TreeMap
+from .unordered_map import IterableMap, UnorderedMap
+from .unordered_set import IterableSet, UnorderedSet
 from .utils import create_enum_prefix, create_prefix_guard
+from .vector import Vector
 
 # Export the collection classes
 __all__ = [

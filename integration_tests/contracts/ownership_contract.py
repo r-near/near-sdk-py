@@ -1,4 +1,4 @@
-from near_sdk_py import Contract, view, call, init
+from near_sdk_py import Contract, call, init, view
 
 
 class OwnershipContract(Contract):

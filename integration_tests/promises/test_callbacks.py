@@ -10,8 +10,9 @@ This module demonstrates how to use callbacks with NEAR's Promises API:
 These examples show how to process data returned from other contracts.
 """
 
-from near_pytest.testing import NearTestCase
 import json
+
+from near_pytest.testing import NearTestCase
 
 
 class TestPromiseCallbacks(NearTestCase):

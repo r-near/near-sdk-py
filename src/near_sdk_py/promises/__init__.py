@@ -7,8 +7,8 @@ cross-contract calls with method chaining and modern Python syntax.
 
 from .batch import BatchAction, PromiseBatch
 from .contract import CrossContract
-from .promise import Promise, PromiseResult
 from .decorators import callback, multi_callback
+from .promise import Promise, PromiseResult
 
 __all__ = [
     "BatchAction",

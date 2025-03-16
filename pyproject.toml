@@ -31,3 +31,6 @@ branch = "main"
 changelog_file = "CHANGELOG.md"
 commit_message = "chore(release): {version} [skip ci]"
 build_command = "uv build"
+
+[tool.ruff.lint]
+extend-select = ["I"]

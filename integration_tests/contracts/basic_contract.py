@@ -7,7 +7,7 @@ This contract demonstrates the simplest forms of Promise usage:
 - Direct return of promise results
 """
 
-from near_sdk_py import call, view, Storage
+from near_sdk_py import Storage, call, view
 from near_sdk_py.promises import CrossContract
 
 
