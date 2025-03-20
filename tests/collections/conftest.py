@@ -2,7 +2,7 @@
 Pytest configuration and shared fixtures for NEAR SDK tests.
 """
 
-import json
+import pickle
 from typing import Dict, Optional
 
 import pytest
@@ -84,14 +84,10 @@ def dump_storage():
         print("\n--- Mock Storage Contents ---")
         for key, value_bytes in mock_storage.items():
             try:
-                # Try to decode as JSON
-                value_str = value_bytes.decode("utf-8")
-                try:
-                    value = json.loads(value_str)
-                    print(f"{key}: {value}")
-                except json.JSONDecodeError:
-                    print(f"{key}: {value_str}")
+                value = pickle.loads(value_bytes)
+                print(f"{key}: {value}")
             except UnicodeDecodeError:
+                print("error, raw bytes instead")
                 print(f"{key}: {value_bytes}")
         print("----------------------------")
 

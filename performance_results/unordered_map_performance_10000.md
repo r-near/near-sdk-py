@@ -1,25 +1,23 @@
-# UnorderedMap Performance Test Results
+# UnorderedSet Performance Test Results
 
-UnorderedMap size: 10000 elements
+UnorderedSet size: 10000 elements
 
 | Operation | Gas (TGas) | vs. Baseline | Details |
 |-----------|------------|--------------|----------|
-| hello world (baseline) | 7.4012 | 1.00x | Basic function call |
-| get_length | 7.6488 | 1.03x | Map size: 10000 |
-| get_item (key lookup) | 7.7610 | 1.05x | Average of 6 keys |
-|   - get_item for key key_0 | 7.7520 | 1.05x | Direct lookup of key key_0 |
-|   - get_item for key key_1 | 7.7520 | 1.05x | Direct lookup of key key_1 |
-|   - get_item for key key_100 | 7.7632 | 1.05x | Direct lookup of key key_100 |
-|   - get_item for key key_999 | 7.7632 | 1.05x | Direct lookup of key key_999 |
-|   - get_item for key key_5000 | 7.7677 | 1.05x | Direct lookup of key key_5000 |
-|   - get_item for key key_9999 | 7.7677 | 1.05x | Direct lookup of key key_9999 |
-| contains_key | 7.5777 | 1.02x | Average of 6 keys |
-| remove_item | 12.0511 | 1.63x | Removes item with key key_5000 |
-| set_item (update existing) | 8.1054 | 1.10x | Updates existing item with key key_1 |
-| set_item (insert new) | 9.9539 | 1.34x | Inserts new item with key key_new |
-| get_items (pagination) | 11.1290 | 1.50x | Retrieves first 5 items |
+| hello world (baseline) | 7.3869 | 1.00x | Basic function call |
+| get_length | 7.6414 | 1.03x | Set size: 10000 |
+| contains_value (item lookup) | 7.6056 | 1.03x | Average of 6 items |
+|   - contains_value for item bulk_item_0 | 7.6008 | 1.03x | Direct lookup of item bulk_item_0 |
+|   - contains_value for item bulk_item_1 | 7.6008 | 1.03x | Direct lookup of item bulk_item_1 |
+|   - contains_value for item bulk_item_100 | 7.6066 | 1.03x | Direct lookup of item bulk_item_100 |
+|   - contains_value for item bulk_item_999 | 7.6066 | 1.03x | Direct lookup of item bulk_item_999 |
+|   - contains_value for item bulk_item_5000 | 7.6094 | 1.03x | Direct lookup of item bulk_item_5000 |
+|   - contains_value for item bulk_item_9999 | 7.6093 | 1.03x | Direct lookup of item bulk_item_9999 |
+| remove_item | 11.9519 | 1.62x | Removes item with value bulk_item_5000 |
+| add_item (insert new) | 9.8328 | 1.33x | Inserts new item with value new_value |
+| get_paginated_items (pagination) | 10.2286 | 1.38x | Retrieves first 5 items |
 
 
 ## Test Information
 
-- Date/Time: 2025-03-20 11:30:54
+- Date/Time: 2025-03-20 13:04:36

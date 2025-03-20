@@ -1,7 +1,7 @@
 from near_pytest.testing import NearTestCase
 
 
-class TestVector(NearTestCase):
+class TestVectorContract(NearTestCase):
     @classmethod
     def setup_class(cls):
         # Call parent setup method first
