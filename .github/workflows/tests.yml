@@ -35,7 +35,6 @@ jobs:
           path: |
             examples/build
             examples/*/build
-            ~/.near-pytest
           key: build-${{ runner.os }}-${{ hashFiles('examples/**') }}-${{ github.sha }}
           restore-keys: |
             build-${{ runner.os }}-${{ hashFiles('examples/**') }}-
