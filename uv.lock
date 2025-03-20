@@ -546,13 +546,14 @@ wheels = [
 
 [[package]]
 name = "near-sdk-py"
-version = "0.4.1"
+version = "0.5.3"
 source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "near-pytest" },
+    { name = "py-near-fork" },
     { name = "pytest" },
     { name = "pytest-xdist" },
     { name = "rich" },
@@ -565,6 +566,7 @@ dev = [
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "near-pytest", specifier = ">=0.5.4" },
+    { name = "py-near-fork", specifier = ">=0.1.1" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
