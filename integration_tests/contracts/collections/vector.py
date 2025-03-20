@@ -36,3 +36,14 @@ class VectorContract(Contract):
         # Clear all items in the vector
         self.vector.clear()
         return {"length": len(self.vector)}
+
+    @call
+    def pop_item(self, index=-1):
+        # Pop an item from the vector at the specified index
+        # Default is to pop the last item
+        return {"item": self.vector.pop(index)}
+
+    @call
+    def swap_remove_item(self, index: int):
+        # Remove an item by swapping with the last item
+        return {"item": self.vector.swap_remove(index)}
