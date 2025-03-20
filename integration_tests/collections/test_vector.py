@@ -112,6 +112,8 @@ class TestVector(NearTestCase):
 
     def test_vector_swap_remove(self):
         """Test Vector swap_remove operations."""
+
+        self.vector_contract.call(method_name="clear_items")
         # Add items to the vector
         for i in range(5):
             self.vector_contract.call(
