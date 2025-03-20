@@ -1,23 +1,19 @@
 """
-UnorderedMap collection for NEAR smart contracts.
+UnorderedMap collection for NEAR smart contracts optimized with Rust-like semantics.
+Uses separate vectors for keys and values with index tracking for O(1) operations.
 """
 
-from typing import Any, Iterator, Optional, Tuple  # Keep typing for docs
-
-import near
+from typing import Any, Iterator, Optional, Tuple
 
 from .adapter import CollectionStorageAdapter
-from .base import PrefixType
-from .lookup_map import LookupMap
+from .base import Collection, PrefixType
 from .vector import Vector
 
 
-class UnorderedMap(LookupMap):
+class UnorderedMap(Collection):
     """
-    An iterable persistent map implementation for NEAR.
-
-    Similar to Python's dict with full iteration support.
-    Uses additional storage to track keys for iteration.
+    A persistent map optimized for NEAR with efficient insertion, deletion, and iteration.
+    Mimics Rust's UnorderedMap using key and value vectors with index tracking.
     """
 
     def __init__(self, prefix: str):
@@ -25,161 +21,159 @@ class UnorderedMap(LookupMap):
         Initialize a new UnorderedMap with the given prefix.
 
         Args:
-            prefix: A unique string prefix for this collection
+            prefix: A unique string prefix for storage keys.
         """
-        super().__init__(prefix)
-        # Override the collection type
-        self._update_metadata({"type": PrefixType.UNORDERED_MAP})
+        super().__init__(prefix, PrefixType.UNORDERED_MAP)
+        self.prefix = prefix
+        self.keys_vector = Vector(f"{prefix}_keys")  # Stores keys in order
+        self.values_vector = Vector(f"{prefix}_vals")  # Stores values in order
+        self.index_prefix = f"{prefix}_indices"  # Maps key -> index in vectors
 
-        # Key for storing the list of keys
-        self._keys_prefix = f"{prefix}:keys"
-        self._keys_vector = Vector(self._keys_prefix)
-        # Add a key_index_prefix for the index lookup
-        self._indices_prefix = f"{prefix}:indices"  # New prefix for tracking indices
+    def _serialize_key(self, key: Any) -> bytes:
+        """Serialize key deterministically (replace with Borsh or similar)."""
+        return str(key).encode()
+
+    def _index_key(self, key: Any) -> str:
+        """Generate storage key for the index of a given key."""
+        serialized = self._serialize_key(key)
+        return f"{self.index_prefix}:{serialized.hex()}"
 
     def __setitem__(self, key: Any, value: Any) -> None:
-        """
-        Set the value for the given key and track the key for iteration.
+        """Insert or update a key-value pair."""
+        index_storage_key = self._index_key(key)
+        existing_index = CollectionStorageAdapter.read(index_storage_key)
 
-        Args:
-            key: The key to set
-            value: The value to store
-        """
-        storage_key = self._make_key(key)
-        exists = near.storage_has_key(storage_key)
-
-        # Store the value
-        CollectionStorageAdapter.write(storage_key, value)
-
-        # Track the key if it's new
-        if not exists:
-            # Add key to vector and store its index
-            index = len(self._keys_vector)
-            self._keys_vector.append(key)
-            index_key = self._make_index_key(key)
-            CollectionStorageAdapter.write(index_key, index)
-            self._set_length(len(self) + 1)
+        if existing_index is not None:
+            # Update existing value
+            self.values_vector[existing_index] = value
+        else:
+            # Append new entry
+            new_index = len(self.keys_vector)
+            self.keys_vector.append(key)
+            self.values_vector.append(value)
+            CollectionStorageAdapter.write(index_storage_key, new_index)
 
     def __delitem__(self, key: Any) -> None:
+        """Remove a key-value pair using swap_remove for O(1) operation."""
+        index_storage_key = self._index_key(key)
+        index = CollectionStorageAdapter.read(index_storage_key)
+
+        if index is None:
+            raise KeyError(key)
+
+        # Perform swap_remove on both vectors
+        last_idx = len(self.keys_vector) - 1
+        last_key = self.keys_vector[last_idx]
+
+        self.keys_vector.swap_remove(index)
+        self.values_vector.swap_remove(index)
+
+        # Update the index of the last element if it was moved
+        if index != last_idx:
+            last_key_index = self._index_key(last_key)
+            CollectionStorageAdapter.write(last_key_index, index)
+
+        # Remove the index entry for the deleted key
+        CollectionStorageAdapter.remove(index_storage_key)
+
+    def __getitem__(self, key: Any) -> Any:
+        """Retrieve the value for a key."""
+        index_storage_key = self._index_key(key)
+        index = CollectionStorageAdapter.read(index_storage_key)
+        if index is None:
+            raise KeyError(key)
+        return self.values_vector[index]
+
+    def __len__(self) -> int:
+        """Return the number of elements in the map."""
+        return len(self.keys_vector)
+
+    def __iter__(self) -> Iterator[Any]:
+        """Iterate over keys in insertion-agnostic order (due to swaps)."""
+        return iter(self.keys_vector)
+
+    def keys(self) -> Iterator[Any]:
+        """Return an iterator over keys."""
+        return self.__iter__()
+
+    def values(self) -> Iterator[Any]:
+        """Return an iterator over values."""
+        return iter(self.values_vector)
+
+    def items(
+        self, start: int = 0, limit: Optional[int] = None
+    ) -> Iterator[Tuple[Any, Any]]:
         """
-        Remove the given key and untrack it.
+        Efficient paginated iteration using vector indices, similar to Rust's seek/take.
+
+        Args:
+            start: Starting index (0-based)
+            limit: Maximum number of items to return
+
+        Yields:
+            (key, value) tuples
+        """
+        total_len = len(self.keys_vector)
+
+        # Handle negative start (Python-style slicing)
+        if start < 0:
+            start += total_len
+        start = max(start, 0)
+
+        # Calculate end index
+        end = start + (limit if limit is not None else total_len)
+        end = min(end, total_len)
+
+        # Direct index-based access for efficient pagination
+        for i in range(start, end):
+            yield (self.keys_vector[i], self.values_vector[i])
+
+    def seek(
+        self, start: int = 0, limit: Optional[int] = None
+    ) -> Iterator[Tuple[Any, Any]]:
+        """Alias for items() with Rust-style naming"""
+        return self.items(start, limit)
+
+    def clear(self) -> None:
+        """Remove all elements from the map."""
+        # Remove all indices
+        for key in self.keys_vector:
+            CollectionStorageAdapter.remove(self._index_key(key))
+
+        # Clear vectors
+        self.keys_vector.clear()
+        self.values_vector.clear()
+
+    def get(self, key: Any, default: Optional[Any] = None) -> Any:
+        """Safely get a value or return default if missing."""
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def remove(self, key: Any) -> Optional[Any]:
+        """
+        Remove the given key and return its value.
 
         Args:
             key: The key to remove
 
-        Raises:
-            KeyError: If the key doesn't exist
-        """
-        storage_key = self._make_key(key)
-
-        if not near.storage_has_key(storage_key):
-            raise KeyError(key)
-
-        # Get the index of the key in the vector
-        index_key = self._make_index_key(key)
-        if not near.storage_has_key(index_key):
-            # Fallback to linear search if index not found (should not happen)
-            for i, k in enumerate(self._keys_vector):
-                if k == key:
-                    self._keys_vector.swap_remove(i)
-                    break
-        else:
-            # Use the stored index for O(1) deletion
-            index = CollectionStorageAdapter.read(index_key)
-            assert index is not None  # Only for mypy
-            if index < len(self._keys_vector):
-                # If we do a swap_remove, we need to update the index of the key that gets moved
-                if index != len(self._keys_vector) - 1:  # Not removing the last element
-                    # Get the key that will be moved from the end
-                    moved_key = self._keys_vector[len(self._keys_vector) - 1]
-                    # Update its index in the storage
-                    moved_key_index = self._make_index_key(moved_key)
-                    CollectionStorageAdapter.write(moved_key_index, index)
-
-                # Remove the key from the vector
-                self._keys_vector.swap_remove(index)
-
-            # Remove the index mapping
-            CollectionStorageAdapter.remove(index_key)
-
-        # Remove the value and decrease length
-        CollectionStorageAdapter.remove(storage_key)
-        self._set_length(len(self) - 1)
-
-    def _make_index_key(self, key: Any) -> str:
-        """Create a storage key for the index of a key"""
-        return f"{self._indices_prefix}:{key}"
-
-    def __iter__(self) -> Iterator:
-        """Return an iterator over the keys"""
-        return iter(self._keys_vector)
-
-    def keys(self) -> Iterator[Any]:
-        """Return an iterator over the keys"""
-        return iter(self._keys_vector)
-
-    def values(self) -> Iterator[Any]:
-        """Return an iterator over the values"""
-        for key in self._keys_vector:
-            yield self[key]
-
-    def items(
-        self, start_index: int = 0, limit: Optional[int] = None
-    ) -> Iterator[Tuple[Any, Any]]:
-        """
-        Return an iterator over the (key, value) pairs with pagination support.
-
-        Args:
-            start_index: Index to start iterating from (0-based)
-            limit: Maximum number of items to return
-
         Returns:
-            Iterator over (key, value) pairs
+            The value for the given key, or None if the key didn't exist
         """
-        keys_count = len(self._keys_vector)
+        try:
+            value = self[key]
+            del self[key]
+            return value
+        except Exception:
+            return None
 
-        if start_index >= keys_count:
-            return
+    def __contains__(self, key: Any) -> bool:
+        """Check if the key exists in the map."""
+        return CollectionStorageAdapter.has(self._index_key(key))
 
-        end_index = (
-            keys_count if limit is None else min(start_index + limit, keys_count)
-        )
-
-        for i in range(start_index, end_index):
-            key = self._keys_vector[i]
-            yield (key, self[key])
-
-    def seek(
-        self, start_index: int = 0, limit: Optional[int] = None
-    ) -> Iterator[Tuple[Any, Any]]:
-        """
-        Efficiently seek to a specific position and return items.
-
-        Args:
-            start_index: Index to start from (0-based)
-            limit: Maximum number of items to return
-
-        Returns:
-            Iterator over (key, value) pairs
-        """
-        return self.items(start_index, limit)
-
-    def clear(self) -> None:
-        """Remove all elements from the map"""
-        # Clear all values and indices
-        for key in self._keys_vector:
-            storage_key = self._make_key(key)
-            CollectionStorageAdapter.remove(storage_key)
-
-            index_key = self._make_index_key(key)
-            CollectionStorageAdapter.remove(index_key)
-
-        # Clear the keys vector
-        self._keys_vector.clear()
-
-        # Reset length
-        self._set_length(0)
+    def is_empty(self) -> bool:
+        return self.keys_vector.is_empty() and self.values_vector.is_empty()
 
 
-# Define IterableMap as an alias for UnorderedMap for compatibility
 IterableMap = UnorderedMap
