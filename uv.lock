@@ -1,6 +1,10 @@
 version = 1
 revision = 1
 requires-python = ">=3.11"
+resolution-markers = [
+    "python_full_version >= '3.12'",
+    "python_full_version < '3.12'",
+]
 
 [[package]]
 name = "annotated-types"
@@ -516,11 +520,14 @@ wheels = [
 name = "near-abi-py"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.12'",
+]
 dependencies = [
-    { name = "click" },
-    { name = "jsonschema" },
-    { name = "pathspec" },
-    { name = "rich" },
+    { name = "click", marker = "python_full_version < '3.12'" },
+    { name = "jsonschema", marker = "python_full_version < '3.12'" },
+    { name = "pathspec", marker = "python_full_version < '3.12'" },
+    { name = "rich", marker = "python_full_version < '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/33/ca/ec894963a188cf492b7098bc58f9cd737550a74c2846ffc4a56731574c3a/near_abi_py-0.4.0.tar.gz", hash = "sha256:fa668c9537b3adbb048a4154da60a5e752b29479c69012ffdfbac49fc24ae63d", size = 60448 }
 wheels = [
@@ -528,8 +535,27 @@ wheels = [
 ]
 
 [[package]]
+name = "near-abi-py"
+version = "0.5.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.12'",
+]
+dependencies = [
+    { name = "click", marker = "python_full_version >= '3.12'" },
+    { name = "jsonschema", marker = "python_full_version >= '3.12'" },
+    { name = "pathspec", marker = "python_full_version >= '3.12'" },
+    { name = "pydantic", marker = "python_full_version >= '3.12'" },
+    { name = "rich", marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c9/b2/3fb32174abcef704dd84ad7d075713ec4b9c820a610cb5d5927256f9e4dc/near_abi_py-0.5.0.tar.gz", hash = "sha256:feab62f9acb99ea547aed4e7008c5beb06b9adb68ab63ce3d2250b3d79181f79", size = 47835 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/c5/6eaeb60eb0bdea76ab2ca8154c2cf07e5ad885e9a50d1cb839b58433347a/near_abi_py-0.5.0-py3-none-any.whl", hash = "sha256:571be721a292d90218a3acf555f60d26e5fc75fd8ccfd633cef0823834c3a1ca", size = 15729 },
+]
+
+[[package]]
 name = "near-pytest"
-version = "0.5.4"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "base58" },
@@ -539,20 +565,21 @@ dependencies = [
     { name = "pytest" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6e/fc/c8022e5d2ac9b6deceafdf1e9dd1de447c46dfdc6c47c611cb294b51d315/near_pytest-0.5.4.tar.gz", hash = "sha256:4ca02ce934119647a4fde2dce38785dcd59819b7c63b9687d415e14c886f6069", size = 65653 }
+sdist = { url = "https://files.pythonhosted.org/packages/25/ec/95af3b9c9ed1404564e5e1f8f5bb20b4aea0e533e16065312fd3cb661100/near_pytest-0.7.1.tar.gz", hash = "sha256:0e2468847e39b64a92d97c786e3cc9133a60733b8acf04b4a8f8bc2a5f1fc000", size = 71032 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d1/77/a1c592dbe2e791ac30238ce408a19913e96dde945f7da86d5721e7f3c910/near_pytest-0.5.4-py3-none-any.whl", hash = "sha256:b0693377be91acf792b7106e49207e6b33ac19cd342f601f2af46b4a2075eb29", size = 16876 },
+    { url = "https://files.pythonhosted.org/packages/61/0c/0fef87edfce405a5a32e19fef6f67ffebb6ced54e2ddef811fbfcce4c8fa/near_pytest-0.7.1-py3-none-any.whl", hash = "sha256:434a79d6b513ba93c894c62f68bbe170b008fa58a30334293893c2257860340f", size = 22004 },
 ]
 
 [[package]]
 name = "near-sdk-py"
-version = "0.4.1"
+version = "0.6.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "near-pytest" },
+    { name = "py-near-fork" },
     { name = "pytest" },
     { name = "pytest-xdist" },
     { name = "rich" },
@@ -564,7 +591,8 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
-    { name = "near-pytest", specifier = ">=0.5.4" },
+    { name = "near-pytest", specifier = ">=0.7.1" },
+    { name = "py-near-fork", specifier = ">=0.1.1" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
     { name = "rich", specifier = ">=13.9.4" },
@@ -573,10 +601,11 @@ dev = [
 
 [[package]]
 name = "nearc"
-version = "0.8.1"
+version = "0.8.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "near-abi-py" },
+    { name = "near-abi-py", version = "0.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "near-abi-py", version = "0.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pathspec" },
     { name = "python-semantic-release" },
     { name = "rich" },
@@ -585,9 +614,9 @@ dependencies = [
     { name = "types-zstd" },
     { name = "zstd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/22/a3/6b35ab704551207b2d0e4dd086e346db22420b52d22548f78ecc172d08a9/nearc-0.8.1.tar.gz", hash = "sha256:3778f55c02c69b8f6d052c7bd286e2851732f1c229b917792896a1a365daa3b1", size = 8356453 }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/6b/6db811e5530b1e866d718e1222fc9397e46ebc4ee03157cee1038e169004/nearc-0.8.8.tar.gz", hash = "sha256:dc806ef42ff643ef2a986b22e7d5bc2c6749a0ff09ecd9127e0973019a8e86bb", size = 8357751 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/df/96a1e9c272ff55233ef1bddb7eebb46ac862937e1e63e56cc763be999c51/nearc-0.8.1-py3-none-any.whl", hash = "sha256:59b769a1c92a429d1f9f3461014c8b48a17eb1c7e2c8ecdb7f9fc6d3f547c312", size = 11595689 },
+    { url = "https://files.pythonhosted.org/packages/f1/9d/ba069ccc649f509c344ba6b421a6c49e1ac1d49fc837ba74c2b9be4d0dbc/nearc-0.8.8-py3-none-any.whl", hash = "sha256:d3ba76a339852110d3c129d9d1e9813f092b2a23477352116fd8b99b18c3b70b", size = 11596938 },
 ]
 
 [[package]]

@@ -1,5 +1,3 @@
-import json
-
 from near_pytest.testing import NearTestCase
 
 
@@ -38,7 +36,9 @@ class TestSimpleGreetingContract(NearTestCase):
 
     def test_get_greeting_default(self):
         """Test retrieving the default greeting."""
-        greeting = self.instance.call_as(account=self.alice, method_name="get_greeting")
+        greeting = self.instance.call_as(
+            account=self.alice, method_name="get_greeting"
+        ).text
 
         assert greeting == "Initial greeting"
 
@@ -46,18 +46,18 @@ class TestSimpleGreetingContract(NearTestCase):
         """Test setting a new greeting."""
         new_greeting = "Hello from Alice!"
 
-        result = self.instance.call_as(
+        response = self.instance.call_as(
             account=self.alice,
             method_name="set_greeting",
             args={"message": new_greeting},
-        )
+        ).json()
 
-        result = json.loads(result)
-
-        assert result["success"] is True
+        assert response["success"] is True
 
         # Verify the greeting was updated
-        greeting = self.instance.call_as(account=self.alice, method_name="get_greeting")
+        greeting = self.instance.call_as(
+            account=self.alice, method_name="get_greeting"
+        ).text
 
         assert greeting == new_greeting
 
@@ -68,20 +68,20 @@ class TestSimpleGreetingContract(NearTestCase):
             account=self.alice,
             method_name="set_greeting",
             args={"message": "Hello world!"},
-        )
+        ).text
 
         # Get greeting in different languages
         english = self.instance.call_as(
             account=self.alice,
             method_name="get_greeting_with_language",
             args={"language": "english"},
-        )
+        ).text
 
         spanish = self.instance.call_as(
             account=self.alice,
             method_name="get_greeting_with_language",
             args={"language": "spanish"},
-        )
+        ).text
 
         assert english == "Hello world!"
         assert spanish == "¡Hola mundo!"

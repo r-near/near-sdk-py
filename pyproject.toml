@@ -13,7 +13,8 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
-    "near-pytest>=0.5.4",
+    "near-pytest>=0.7.1",
+    "py-near-fork>=0.1.1",
     "pytest>=8.3.5",
     "pytest-xdist>=3.6.1",
     "rich>=13.9.4",

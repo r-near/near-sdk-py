@@ -34,6 +34,8 @@ class UnorderedMap(LookupMap):
         # Key for storing the list of keys
         self._keys_prefix = f"{prefix}:keys"
         self._keys_vector = Vector(self._keys_prefix)
+        # Add a key_index_prefix for the index lookup
+        self._indices_prefix = f"{prefix}:indices"  # New prefix for tracking indices
 
     def __setitem__(self, key: Any, value: Any) -> None:
         """
@@ -51,7 +53,11 @@ class UnorderedMap(LookupMap):
 
         # Track the key if it's new
         if not exists:
+            # Add key to vector and store its index
+            index = len(self._keys_vector)
             self._keys_vector.append(key)
+            index_key = self._make_index_key(key)
+            CollectionStorageAdapter.write(index_key, index)
             self._set_length(len(self) + 1)
 
     def __delitem__(self, key: Any) -> None:
@@ -69,16 +75,40 @@ class UnorderedMap(LookupMap):
         if not near.storage_has_key(storage_key):
             raise KeyError(key)
 
-        # Remove the value
+        # Get the index of the key in the vector
+        index_key = self._make_index_key(key)
+        if not near.storage_has_key(index_key):
+            # Fallback to linear search if index not found (should not happen)
+            for i, k in enumerate(self._keys_vector):
+                if k == key:
+                    self._keys_vector.swap_remove(i)
+                    break
+        else:
+            # Use the stored index for O(1) deletion
+            index = CollectionStorageAdapter.read(index_key)
+            assert index is not None  # Only for mypy
+            if index < len(self._keys_vector):
+                # If we do a swap_remove, we need to update the index of the key that gets moved
+                if index != len(self._keys_vector) - 1:  # Not removing the last element
+                    # Get the key that will be moved from the end
+                    moved_key = self._keys_vector[len(self._keys_vector) - 1]
+                    # Update its index in the storage
+                    moved_key_index = self._make_index_key(moved_key)
+                    CollectionStorageAdapter.write(moved_key_index, index)
+
+                # Remove the key from the vector
+                self._keys_vector.swap_remove(index)
+
+            # Remove the index mapping
+            CollectionStorageAdapter.remove(index_key)
+
+        # Remove the value and decrease length
         CollectionStorageAdapter.remove(storage_key)
-
-        # Find and remove the key from the keys vector
-        for i, k in enumerate(self._keys_vector):
-            if k == key:
-                self._keys_vector.swap_remove(i)
-                break
-
         self._set_length(len(self) - 1)
+
+    def _make_index_key(self, key: Any) -> str:
+        """Create a storage key for the index of a key"""
+        return f"{self._indices_prefix}:{key}"
 
     def __iter__(self) -> Iterator:
         """Return an iterator over the keys"""
@@ -136,10 +166,13 @@ class UnorderedMap(LookupMap):
 
     def clear(self) -> None:
         """Remove all elements from the map"""
-        # Clear all values
+        # Clear all values and indices
         for key in self._keys_vector:
             storage_key = self._make_key(key)
             CollectionStorageAdapter.remove(storage_key)
+
+            index_key = self._make_index_key(key)
+            CollectionStorageAdapter.remove(index_key)
 
         # Clear the keys vector
         self._keys_vector.clear()

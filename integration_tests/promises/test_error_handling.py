@@ -10,8 +10,6 @@ These examples show how to build robust cross-contract interactions
 that can handle failure cases gracefully.
 """
 
-import json
-
 from near_pytest.testing import NearTestCase
 
 
@@ -66,15 +64,12 @@ class TestPromiseErrorHandling(NearTestCase):
         )
 
         # Call a method that tries to call a non-existent method on contract2
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_nonexistent_method",
             args={"contract_id": self.instance2.account_id},
             gas=300 * 10**12,  # Allocate plenty of gas
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify that the error was properly detected and handled
         assert response["success"] is False
@@ -119,7 +114,7 @@ class TestPromiseErrorHandling(NearTestCase):
         )
 
         # First test the happy path - primary contract succeeds
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_with_fallback",
             args={
@@ -128,10 +123,7 @@ class TestPromiseErrorHandling(NearTestCase):
                 "key": test_key,
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify primary call succeeded
         assert response["success"] is True
@@ -143,7 +135,7 @@ class TestPromiseErrorHandling(NearTestCase):
         # Now test the fallback path by using an invalid contract as primary
         nonexistent_account = "nonexistent.near"
 
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_with_fallback",
             args={
@@ -152,10 +144,7 @@ class TestPromiseErrorHandling(NearTestCase):
                 "key": test_key,
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify fallback was used
         assert response["success"] is True
@@ -197,7 +186,7 @@ class TestPromiseErrorHandling(NearTestCase):
 
         # Test with short value (should not meet criteria)
         min_length = 10
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="conditional_callback",
             args={
@@ -206,10 +195,7 @@ class TestPromiseErrorHandling(NearTestCase):
                 "min_length": min_length,
             },
             gas=200 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify criteria check failed but call succeeded
         assert response["success"] is True
@@ -219,7 +205,7 @@ class TestPromiseErrorHandling(NearTestCase):
         print(f"Short value correctly failed criteria check: {response}")
 
         # Test with long value (should meet criteria)
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="conditional_callback",
             args={
@@ -228,10 +214,7 @@ class TestPromiseErrorHandling(NearTestCase):
                 "min_length": min_length,
             },
             gas=200 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify criteria check passed
         assert response["success"] is True

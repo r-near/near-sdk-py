@@ -34,6 +34,8 @@ class UnorderedSet(LookupSet):
         # Vector for storing the values for iteration
         self._values_prefix = f"{prefix}:values"
         self._values_vector = Vector(self._values_prefix)
+        # dict for storing value -> index.  Key is serialized value.
+        self._indices_prefix = f"{prefix}:indices"  # New prefix for tracking indices
 
     def add(self, value: Any) -> None:
         """
@@ -48,13 +50,17 @@ class UnorderedSet(LookupSet):
         if not exists:
             # Store the marker
             CollectionStorageAdapter.write(storage_key, True)
-            # Track the value
+            # Track the value and get its index
+            index = len(self._values_vector)
             self._values_vector.append(value)
+            # Store index, using raw value as key
+            index_key = self._make_index_key(value)
+            CollectionStorageAdapter.write(index_key, index)
             self._set_length(len(self) + 1)
 
     def remove(self, value: Any) -> None:
         """
-        Remove a value from the set and untrack it.
+        Remove a value from the set and untrack it.  O(1) time complexity.
 
         Args:
             value: The value to remove
@@ -67,16 +73,36 @@ class UnorderedSet(LookupSet):
         if not near.storage_has_key(storage_key):
             raise KeyError(value)
 
-        # Remove the marker
+        # Get the index of the value in the vector
+        index_key = self._make_index_key(value)
+        if not near.storage_has_key(index_key):
+            raise Exception("Inconsistent contract state: value index not found.")
+
+        index = CollectionStorageAdapter.read(index_key)
+        assert index is not None, "Inconsistent contract state: value index not found."
+
+        if index < len(self._values_vector):
+            # If we do a swap_remove, we need to update the index of the key that gets moved
+            if index != len(self._values_vector) - 1:  # Not removing the last element
+                # Get the key that will be moved from the end
+                moved_key = self._values_vector[len(self._values_vector) - 1]
+                # Update its index in the storage
+                moved_key_index = self._make_index_key(moved_key)
+                CollectionStorageAdapter.write(moved_key_index, index)
+
+            # Remove the key from the vector
+            self._values_vector.swap_remove(index)
+
+        # Remove the index mapping
+        CollectionStorageAdapter.remove(index_key)
+
+        # Remove the value and decrease length
         CollectionStorageAdapter.remove(storage_key)
-
-        # Find and remove the value from the values vector
-        for i, v in enumerate(self._values_vector):
-            if v == value:
-                self._values_vector.swap_remove(i)
-                break
-
         self._set_length(len(self) - 1)
+
+    def _make_index_key(self, key: Any) -> str:
+        """Create a storage key for the index of a key"""
+        return f"{self._indices_prefix}:{key}"
 
     def __iter__(self) -> Iterator:
         """Return an iterator over the values"""
@@ -121,11 +147,14 @@ class UnorderedSet(LookupSet):
         return self.values(start_index, limit)
 
     def clear(self) -> None:
-        """Remove all values from the set"""
-        # Clear all markers
+        """Remove all elements from the set"""
+        # Clear all values and indices
         for value in self._values_vector:
             storage_key = self._make_key(value)
             CollectionStorageAdapter.remove(storage_key)
+
+            index_key = self._make_index_key(value)
+            CollectionStorageAdapter.remove(index_key)
 
         # Clear the values vector
         self._values_vector.clear()

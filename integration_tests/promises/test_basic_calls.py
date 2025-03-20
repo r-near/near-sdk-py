@@ -71,7 +71,7 @@ class TestBasicPromiseCalls(NearTestCase):
         )
 
         # Verify we got the value from contract2
-        assert result == "Hello from Contract 2!"
+        assert result.text == "Hello from Contract 2!"
         print(f"Successfully retrieved cross-contract data: {result}")
 
     def test_cross_contract_default_values(self):
@@ -90,7 +90,7 @@ class TestBasicPromiseCalls(NearTestCase):
         )
 
         # The contract should return the default value
-        assert result == "default_value"
+        assert result.text == "default_value"
         print(f"Retrieved default value for non-existent key: {result}")
 
     def test_echo_method(self):
@@ -108,7 +108,7 @@ class TestBasicPromiseCalls(NearTestCase):
             args={"message": message},
         )
 
-        assert result == message
+        assert result.text == message
         print(f"Echo method successfully returned: {result}")
 
     def test_writing_and_reading_values(self):
@@ -135,5 +135,5 @@ class TestBasicPromiseCalls(NearTestCase):
             args={"key": test_key},
         )
 
-        assert result == test_value
+        assert result.text == test_value
         print(f"Successfully stored and retrieved value: {result}")

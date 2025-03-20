@@ -12,8 +12,6 @@ The tests include:
 - A more complex test with a fake callback context (testing specifically the self-call check)
 """
 
-import json
-
 from near_pytest.testing import NearTestCase
 
 
@@ -63,15 +61,12 @@ class TestCallbackSecurity(NearTestCase):
         )
 
         # Call the method that initiates a legitimate cross-contract call
-        result = self.instance.call_as(
+        response = self.instance.call_as(
             account=self.alice,
             method_name="self_call_with_callback",
             args={"key": "test_key"},
             gas=300 * 10**12,  # Allocate enough gas for the cross-contract call
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify that the call succeeded
         assert response["success"] is True
