@@ -36,6 +36,8 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
         """
         Directly patch the contract storage to create an unordered map with specified number of elements
         using the sandbox_patch_state RPC call.
+
+        This implementation uses indices to make key lookups and removals more efficient.
         """
         account_id = self.map_account.account_id
 
@@ -81,7 +83,7 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
             # Create the key string
             key = f"key_{i}"
 
-            # Create the values storage (LookupMap part)
+            # 1. Create the values storage (LookupMap part)
             value = f"bulk_value_{i}"
             value_storage_key = f"items:{key}"
             encoded_value_key = base64.b64encode(
@@ -101,7 +103,7 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
                 }
             )
 
-            # Create the keys vector storage (Vector part)
+            # 2. Create the keys vector storage (Vector part)
             key_vector_storage_key = f"items:keys:{i}"
             encoded_key_vector_key = base64.b64encode(
                 key_vector_storage_key.encode("utf-8")
@@ -116,6 +118,26 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
                         "account_id": account_id,
                         "data_key": encoded_key_vector_key,
                         "value": encoded_key,
+                    }
+                }
+            )
+
+            # 3. Create the indices mapping (key -> index in vector)
+            # This is the critical addition for efficient removal
+            index_storage_key = f"items:indices:{key}"
+            encoded_index_key = base64.b64encode(
+                index_storage_key.encode("utf-8")
+            ).decode("utf-8")
+            encoded_index_value = base64.b64encode(
+                json.dumps(i).encode("utf-8")
+            ).decode("utf-8")
+
+            records.append(
+                {
+                    "Data": {
+                        "account_id": account_id,
+                        "data_key": encoded_index_key,
+                        "value": encoded_index_value,
                     }
                 }
             )
@@ -246,6 +268,35 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
             }
         )
 
+        # Test remove_item performance
+        print("\nTesting remove_item performance...")
+        key_to_remove = "key_5000"
+        result, tx_result = self.map_contract.call(
+            "remove_item", {"key": key_to_remove}, return_full_result=True
+        )
+        gas_burn_tgas = tx_result.receipt_outcome[0].gas_burnt / 10**12
+        removed = result.json()["removed"]
+        print(
+            f"Removed item with key {key_to_remove}: {removed}, gas usage: {gas_burn_tgas} TGas"
+        )
+        assert gas_burn_tgas < 15, "Remove operation uses too much gas"
+
+        # Add remove_item to performance data
+        performance_data.append(
+            {
+                "operation": "remove_item",
+                "gas_tgas": gas_burn_tgas,
+                "ratio": gas_burn_tgas / hello_world_gas_usage,
+                "details": f"Removes item with key {key_to_remove}",
+            }
+        )
+
+        # Verify length after remove
+        length, tx_result = self.map_contract.call(
+            "get_length", {}, return_full_result=True
+        )
+        assert length.json()["length"] == num_elements - 1
+
         # Test set_item performance (update existing)
         print("\nTesting set_item performance (update existing)...")
         key_to_update = "key_1"
@@ -286,6 +337,11 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
                 "ratio": gas_burn_tgas / hello_world_gas_usage,
                 "details": f"Inserts new item with key {new_key}",
             }
+        )
+
+        # Note: We're skipping full iteration tests as they would exceed gas limits with 10k elements
+        print(
+            "\nNote: Skipping full iteration tests (get_all_keys, get_all_values, get_all_items) as they would exceed gas limits with 10k elements"
         )
 
         # Generate performance comparison table
