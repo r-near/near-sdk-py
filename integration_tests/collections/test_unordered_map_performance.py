@@ -339,9 +339,27 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
             }
         )
 
-        # Note: We're skipping full iteration tests as they would exceed gas limits with 10k elements
-        print(
-            "\nNote: Skipping full iteration tests (get_all_keys, get_all_values, get_all_items) as they would exceed gas limits with 10k elements"
+        # Test pagination (first 5 items)
+        print("\nTesting pagination (first 5 items)...")
+        result, tx_result = self.map_contract.call(
+            "get_paginated_items",
+            {"start_index": 0, "limit": 5},
+            return_full_result=True,
+        )
+        gas_burn_tgas = tx_result.receipt_outcome[0].gas_burnt / 10**12
+        items = result.json()["items"]
+        print(f"Pagination (first 5 items) gas usage: {gas_burn_tgas} TGas")
+        assert len(items) == 5, "Pagination should return 5 items"
+        assert gas_burn_tgas < 15, "Pagination (5 items) uses too much gas"
+
+        # Add pagination to performance data
+        performance_data.append(
+            {
+                "operation": "get_items (pagination)",
+                "gas_tgas": gas_burn_tgas,
+                "ratio": gas_burn_tgas / hello_world_gas_usage,
+                "details": "Retrieves first 5 items",
+            }
         )
 
         # Generate performance comparison table

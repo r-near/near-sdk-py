@@ -65,3 +65,24 @@ class UnorderedMapContract(Contract):
     def contains_key(self, key: str):
         """Check if the map contains a key"""
         return {"contains": key in self.unordered_map}
+
+    @view
+    def get_paginated_items(self, start_index: int, limit: int):
+        """
+        Get a paginated subset of items from the map
+        Args:
+            start_index: The index to start from (0-based)
+            limit: Maximum number of items to return
+        Returns:
+            Dictionary with paginated items and total count
+        """
+        total_items = len(self.unordered_map)
+        items = list(self.unordered_map.items(start_index, limit))
+
+        return {
+            "items": items,
+            "total": total_items,
+            "start_index": start_index,
+            "limit": limit,
+            "page_count": len(items),
+        }
