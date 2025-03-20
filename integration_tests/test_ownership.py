@@ -50,7 +50,7 @@ class TestOwnershipContract(NearTestCase):
         # Verify config was updated
         config = self.instance.call_as(
             account=self.alice, method_name="get_config", args={"key": "max_users"}
-        )
+        ).text
 
         assert int(config) == 100
 
