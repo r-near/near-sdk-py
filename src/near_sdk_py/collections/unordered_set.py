@@ -2,7 +2,7 @@
 UnorderedSet collection for NEAR smart contracts.
 """
 
-from typing import Any, Iterator  # Keep typing for docs
+from typing import Any, Iterator, Optional  # Keep typing for docs
 
 import near
 
@@ -80,11 +80,45 @@ class UnorderedSet(LookupSet):
 
     def __iter__(self) -> Iterator:
         """Return an iterator over the values"""
-        return iter(self._values_vector)
+        return iter(self.values())
 
-    def values(self) -> Iterator[Any]:
-        """Return an iterator over the values"""
-        return iter(self._values_vector)
+    def values(
+        self, start_index: int = 0, limit: Optional[int] = None
+    ) -> Iterator[Any]:
+        """
+        Return an iterator over the values with pagination support.
+
+        Args:
+            start_index: Index to start iterating from (0-based)
+            limit: Maximum number of values to return
+
+        Returns:
+            Iterator over values
+        """
+        values_count = len(self._values_vector)
+
+        if start_index >= values_count:
+            return
+
+        end_index = (
+            values_count if limit is None else min(start_index + limit, values_count)
+        )
+
+        for i in range(start_index, end_index):
+            yield self._values_vector[i]
+
+    def seek(self, start_index: int = 0, limit: Optional[int] = None) -> Iterator[Any]:
+        """
+        Efficiently seek to a specific position and return values.
+
+        Args:
+            start_index: Index to start from (0-based)
+            limit: Maximum number of values to return
+
+        Returns:
+            Iterator over values
+        """
+        return self.values(start_index, limit)
 
     def clear(self) -> None:
         """Remove all values from the set"""
