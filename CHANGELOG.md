@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.6.0 (2025-03-20)
+
+### Features
+
+- Add seek method to UnorderedMap and UnorderedSet for efficient pagination
+  ([#23](https://github.com/r-near/near-sdk-py/pull/23),
+  [`cfff31b`](https://github.com/r-near/near-sdk-py/commit/cfff31ba6b5d978980537da62c521e1721aea0ef))
+
+
 ## v0.5.3 (2025-03-20)
 
 ### Bug Fixes
