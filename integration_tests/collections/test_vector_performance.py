@@ -262,6 +262,11 @@ class TestVectorBulkPerformance(NearTestCase):
             }
         )
 
+        # Note: We're skipping full iteration test as it would exceed gas limits with 10k elements
+        print(
+            "\nNote: Skipping full iteration test (get_all_items) as it would exceed gas limits with 10k elements"
+        )
+
         # Generate performance comparison table
         console = Console()
 
@@ -280,16 +285,10 @@ class TestVectorBulkPerformance(NearTestCase):
 
         for entry in performance_data:
             # Format the ratio to be more readable
-            if entry["ratio"] == float("inf"):
-                ratio_str = "∞"
-            else:
-                ratio_str = f"{entry['ratio']:.2f}x"
+            ratio_str = f"{entry['ratio']:.2f}x"
 
             # Format TGas to 4 decimal places
-            if entry["gas_tgas"] == float("inf"):
-                tgas_str = "∞"
-            else:
-                tgas_str = f"{entry['gas_tgas']:.4f}"
+            tgas_str = f"{entry['gas_tgas']:.4f}"
 
             table.add_row(entry["operation"], tgas_str, ratio_str, entry["details"])
 
