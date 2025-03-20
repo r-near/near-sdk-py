@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.5.3 (2025-03-20)
+
+### Bug Fixes
+
+- **ci**: Don't cache contracts
+  ([`aba6c60`](https://github.com/r-near/near-sdk-py/commit/aba6c6012ae2a795319d74bd29ad683b52d19cc2))
+
+
 ## v0.5.2 (2025-03-16)
 
 ### Bug Fixes
