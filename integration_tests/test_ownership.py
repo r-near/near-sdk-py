@@ -1,5 +1,3 @@
-import json
-
 from near_pytest.testing import NearTestCase
 
 
@@ -46,7 +44,7 @@ class TestOwnershipContract(NearTestCase):
             method_name="update_config",
             args={"key": "max_users", "value": 100},
         )
-        result = json.loads(result)
+        result = result.text
         assert result["success"] is True
 
         # Verify config was updated
@@ -76,7 +74,7 @@ class TestOwnershipContract(NearTestCase):
             method_name="transfer_ownership",
             args={"new_owner": self.bob.account_id},
         )
-        result = json.loads(result)
+        result = result.text
         assert result["success"] is True
 
         # Verify Bob is now the owner
@@ -90,5 +88,5 @@ class TestOwnershipContract(NearTestCase):
             method_name="update_config",
             args={"key": "max_users", "value": 200},
         )
-        result = json.loads(result)
+        result = result.text
         assert result["success"] is True

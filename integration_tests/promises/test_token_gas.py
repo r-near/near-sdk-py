@@ -10,8 +10,6 @@ This module demonstrates how to manage tokens and gas with NEAR's Promises API:
 These examples show how to work with NEAR's economic model in promises.
 """
 
-import json
-
 from near_pytest.testing import NearTestCase
 
 
@@ -60,7 +58,7 @@ class TestTokenGasManagement(NearTestCase):
         # Test token attachment
         amount = 10**23  # 0.1 NEAR
 
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_with_tokens",
             args={
@@ -70,10 +68,7 @@ class TestTokenGasManagement(NearTestCase):
                 "amount": amount,
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the tokens were attached and received
         assert response["success"] is True
@@ -113,7 +108,7 @@ class TestTokenGasManagement(NearTestCase):
         # Test with a fixed gas amount
         gas_amount = 20 * 10**12  # 20 TGas
 
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_with_fixed_gas",
             args={
@@ -123,10 +118,7 @@ class TestTokenGasManagement(NearTestCase):
                 "gas_amount": gas_amount,
             },
             gas=300 * 10**12,  # Total gas for the entire operation
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the fixed gas call worked
         assert response["success"] is True
@@ -164,7 +156,7 @@ class TestTokenGasManagement(NearTestCase):
         # Use 1/3 of available gas for the call
         gas_fraction = 3
 
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_with_proportional_gas",
             args={
@@ -174,10 +166,7 @@ class TestTokenGasManagement(NearTestCase):
                 "gas_fraction": gas_fraction,
             },
             gas=300 * 10**12,  # Total gas for the entire operation
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the proportional gas call worked
         assert response["success"] is True
@@ -204,7 +193,7 @@ class TestTokenGasManagement(NearTestCase):
         # Amount to transfer
         amount = 10**23  # 0.1 NEAR
 
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="transfer_and_call",
             args={
@@ -214,10 +203,7 @@ class TestTokenGasManagement(NearTestCase):
                 "args": {},
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the transfer succeeded
         assert response["success"] is True

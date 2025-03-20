@@ -10,8 +10,6 @@ This module demonstrates how to use callbacks with NEAR's Promises API:
 These examples show how to process data returned from other contracts.
 """
 
-import json
-
 from near_pytest.testing import NearTestCase
 
 
@@ -67,15 +65,12 @@ class TestPromiseCallbacks(NearTestCase):
         )
 
         # Call the method that uses a callback
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="call_with_callback",
             args={"contract_id": self.instance2.account_id, "key": "callback_key"},
             gas=300 * 10**12,  # Allocate more gas for the callback
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify that the callback processed the result correctly
         assert response["success"] is True
@@ -110,7 +105,7 @@ class TestPromiseCallbacks(NearTestCase):
         )
 
         # Call the method that joins promises
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="join_promises",
             args={
@@ -120,10 +115,7 @@ class TestPromiseCallbacks(NearTestCase):
                 "key2": "join_key2",
             },
             gas=300 * 10**12,  # Allocate more gas for multiple promises
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify that both values were retrieved and combined
         assert response["success"] is True
@@ -156,7 +148,7 @@ class TestPromiseCallbacks(NearTestCase):
         )
 
         # Call the chaining method
-        result = self.instance1.call_as(
+        response = self.instance1.call_as(
             account=self.alice,
             method_name="chain_calls",
             args={
@@ -166,10 +158,7 @@ class TestPromiseCallbacks(NearTestCase):
                 "key2": "chain_key2",
             },
             gas=300 * 10**12,  # Allocate more gas for the chain
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the chained operations worked
         assert response["success"] is True

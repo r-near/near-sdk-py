@@ -1,5 +1,3 @@
-import json
-
 from near_pytest import NearTestCase
 
 
@@ -89,16 +87,14 @@ class TestStorageContract(NearTestCase):
         # Check if key exists
         exists = self.instance.call_as(
             account=self.alice, method_name="has_key", args={"key": "exists_key"}
-        )
-        exists = json.loads(exists)
+        ).json()
 
         assert exists is True
 
         # Check if non-existent key exists
         exists = self.instance.call_as(
             account=self.alice, method_name="has_key", args={"key": "nonexistent_key"}
-        )
-        exists = json.loads(exists)
+        ).json()
 
         assert exists is False
 
@@ -122,7 +118,6 @@ class TestStorageContract(NearTestCase):
         # Get the complex value
         result = self.instance.call_as(
             account=self.alice, method_name="get_value", args={"key": "user_data"}
-        )
-        result = json.loads(result)
+        ).json()
 
         assert result == complex_data
