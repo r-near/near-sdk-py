@@ -11,6 +11,11 @@ class VectorContract(Contract):
         self.vector = Vector("items")
 
     @call
+    def hello(self):
+        """Basic check to get a baseline gas usage"""
+        return {"Hello": "World"}
+
+    @call
     def add_item(self, item: str):
         # Add an item to the vector
         self.vector.append(item)
@@ -47,3 +52,14 @@ class VectorContract(Contract):
     def swap_remove_item(self, index: int):
         # Remove an item by swapping with the last item
         return {"item": self.vector.swap_remove(index)}
+
+    @view
+    def iterate_range(self, start: int, end: int):
+        # Iterate through a range of elements
+        count = 0
+        for i, _ in enumerate(self.vector):
+            if i >= start and i < end:
+                count += 1
+            if i >= end:
+                break
+        return {"count": count}
