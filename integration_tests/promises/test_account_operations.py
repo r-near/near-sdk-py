@@ -62,7 +62,7 @@ class TestAccountOperations(NearTestCase):
         public_key = "00" + secrets.token_hex(32)  # ED25519 key prefix + random bytes
         subaccount_name = "sub1"
 
-        result = self.instance.call_as(
+        response = self.instance.call_as(
             account=self.alice,
             method_name="create_subaccount",
             args={
@@ -71,10 +71,7 @@ class TestAccountOperations(NearTestCase):
                 "initial_balance": 10**24,  # 1 NEAR
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the subaccount was created
         assert response["success"] is True
@@ -104,7 +101,7 @@ class TestAccountOperations(NearTestCase):
         public_key = "00" + secrets.token_hex(32)  # ED25519 key prefix + random bytes
 
         # Add a full access key
-        result = self.instance.call_as(
+        response = self.instance.call_as(
             account=self.alice,
             method_name="add_access_key",
             args={
@@ -113,10 +110,7 @@ class TestAccountOperations(NearTestCase):
                 "is_full_access": True,
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the key was added
         assert response["success"] is True
@@ -128,7 +122,7 @@ class TestAccountOperations(NearTestCase):
         # Now add a function call key
         public_key = "00" + secrets.token_hex(32)  # New key
 
-        result = self.instance.call_as(
+        response = self.instance.call_as(
             account=self.alice,
             method_name="add_access_key",
             args={
@@ -140,10 +134,7 @@ class TestAccountOperations(NearTestCase):
                 "method_names": ["get_value", "set_value"],
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the function call key was added
         assert response["success"] is True
@@ -168,7 +159,7 @@ class TestAccountOperations(NearTestCase):
         subaccount_name = "complex"
 
         # Execute a multi-operation sequence
-        result = self.instance.call_as(
+        response = self.instance.call_as(
             account=self.alice,
             method_name="multi_operation_sequence",
             args={
@@ -177,10 +168,7 @@ class TestAccountOperations(NearTestCase):
                 "deploy_and_init": False,  # No contract deployment in this test
             },
             gas=300 * 10**12,
-        )
-
-        # Parse the JSON result
-        response = json.loads(result)
+        ).json()
 
         # Verify the sequence completed successfully
         assert response["success"] is True
