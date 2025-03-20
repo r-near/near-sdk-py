@@ -37,7 +37,7 @@ class TestStorageContract(NearTestCase):
         # Get the value
         value = self.instance.call_as(
             account=self.alice, method_name="get_value", args={"key": "test_key"}
-        )
+        ).text
 
         assert value == "test_value"
 
@@ -48,7 +48,7 @@ class TestStorageContract(NearTestCase):
             account=self.alice,
             method_name="get_value_with_default",
             args={"key": "nonexistent_key", "default": "default_value"},
-        )
+        ).text
 
         assert value == "default_value"
 
@@ -71,7 +71,7 @@ class TestStorageContract(NearTestCase):
             account=self.alice,
             method_name="get_value_with_default",
             args={"key": "temp_key", "default": "was_deleted"},
-        )
+        ).text
 
         assert value == "was_deleted"
 
