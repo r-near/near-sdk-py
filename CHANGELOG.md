@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.7.0 (2025-03-20)
+
+### Features
+
+- Collection Performance Testing and Optimization
+  ([#24](https://github.com/r-near/near-sdk-py/pull/24),
+  [`e50deb5`](https://github.com/r-near/near-sdk-py/commit/e50deb5a77e5bc2b13547f66242cffc6e7fc3144))
+
+
 ## v0.6.0 (2025-03-20)
 
 ### Features
