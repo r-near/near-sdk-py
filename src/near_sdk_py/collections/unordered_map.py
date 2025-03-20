@@ -2,7 +2,7 @@
 UnorderedMap collection for NEAR smart contracts.
 """
 
-from typing import Any, Iterator, Tuple  # Keep typing for docs
+from typing import Any, Iterator, Optional, Tuple  # Keep typing for docs
 
 import near
 
@@ -93,10 +93,46 @@ class UnorderedMap(LookupMap):
         for key in self._keys_vector:
             yield self[key]
 
-    def items(self) -> Iterator[Tuple[Any, Any]]:
-        """Return an iterator over the (key, value) pairs"""
-        for key in self._keys_vector:
+    def items(
+        self, start_index: int = 0, limit: Optional[int] = None
+    ) -> Iterator[Tuple[Any, Any]]:
+        """
+        Return an iterator over the (key, value) pairs with pagination support.
+
+        Args:
+            start_index: Index to start iterating from (0-based)
+            limit: Maximum number of items to return
+
+        Returns:
+            Iterator over (key, value) pairs
+        """
+        keys_count = len(self._keys_vector)
+
+        if start_index >= keys_count:
+            return
+
+        end_index = (
+            keys_count if limit is None else min(start_index + limit, keys_count)
+        )
+
+        for i in range(start_index, end_index):
+            key = self._keys_vector[i]
             yield (key, self[key])
+
+    def seek(
+        self, start_index: int = 0, limit: Optional[int] = None
+    ) -> Iterator[Tuple[Any, Any]]:
+        """
+        Efficiently seek to a specific position and return items.
+
+        Args:
+            start_index: Index to start from (0-based)
+            limit: Maximum number of items to return
+
+        Returns:
+            Iterator over (key, value) pairs
+        """
+        return self.items(start_index, limit)
 
     def clear(self) -> None:
         """Remove all elements from the map"""
