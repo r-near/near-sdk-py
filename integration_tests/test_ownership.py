@@ -33,7 +33,7 @@ class TestOwnershipContract(NearTestCase):
 
     def test_get_owner(self):
         """Test retrieving the contract owner."""
-        owner = self.instance.call_as(account=self.bob, method_name="get_owner")
+        owner = self.instance.call_as(account=self.bob, method_name="get_owner").text
 
         assert owner == self.alice.account_id
 
@@ -78,7 +78,7 @@ class TestOwnershipContract(NearTestCase):
         assert result["success"] is True
 
         # Verify Bob is now the owner
-        owner = self.instance.call_as(account=self.bob, method_name="get_owner")
+        owner = self.instance.call_as(account=self.bob, method_name="get_owner").text
 
         assert owner == self.bob.account_id
 
