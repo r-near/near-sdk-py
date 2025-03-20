@@ -44,13 +44,13 @@ class TestOwnershipContract(NearTestCase):
             method_name="update_config",
             args={"key": "max_users", "value": 100},
         )
-        result = result.text
+        result = result.json()
         assert result["success"] is True
 
         # Verify config was updated
         config = self.instance.call_as(
             account=self.alice, method_name="get_config", args={"key": "max_users"}
-        ).text
+        ).json()
 
         assert int(config) == 100
 
@@ -74,7 +74,7 @@ class TestOwnershipContract(NearTestCase):
             method_name="transfer_ownership",
             args={"new_owner": self.bob.account_id},
         )
-        result = result.text
+        result = result.json()
         assert result["success"] is True
 
         # Verify Bob is now the owner
@@ -88,5 +88,5 @@ class TestOwnershipContract(NearTestCase):
             method_name="update_config",
             args={"key": "max_users", "value": 200},
         )
-        result = result.text
+        result = result.json()
         assert result["success"] is True
