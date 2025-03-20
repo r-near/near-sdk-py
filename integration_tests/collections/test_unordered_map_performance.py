@@ -34,110 +34,96 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
 
     def patch_map_storage(self, num_elements):
         """
-        Directly patch the contract storage to create an unordered map with specified number of elements
-        using the sandbox_patch_state RPC call.
-
-        This implementation uses indices to make key lookups and removals more efficient.
+        Patches storage with exact structure matching Rust's UnorderedMap layout:
+        - Main map metadata with type 'u'
+        - Separate vector metadatas with type 'v'
+        - Hex-encoded index keys
+        - Base64 encoding for all storage entries
         """
         account_id = self.map_account.account_id
-
-        # Create records array
         records = []
 
-        # First, add the metadata record with length information and type
-        metadata = {"version": "1.0.0", "type": "um", "length": num_elements}
-        metadata_key = base64.b64encode(b"items:meta").decode("utf-8")
-        metadata_value = base64.b64encode(json.dumps(metadata).encode("utf-8")).decode(
-            "utf-8"
-        )
-
+        # Main UnorderedMap metadata
+        map_metadata = {
+            "type": "u",  # 'u' for unordered map
+            "version": "1.0.0",
+            "length": num_elements,
+        }
+        map_meta_key = base64.b64encode(b"items:meta").decode()
+        map_meta_value = base64.b64encode(json.dumps(map_metadata).encode()).decode()
         records.append(
             {
                 "Data": {
                     "account_id": account_id,
-                    "data_key": metadata_key,
-                    "value": metadata_value,
+                    "data_key": map_meta_key,
+                    "value": map_meta_value,
                 }
             }
         )
 
-        # Add the keys vector metadata
-        keys_metadata = {"version": "1.0.0", "type": "v", "length": num_elements}
-        keys_metadata_key = base64.b64encode(b"items:keys:meta").decode("utf-8")
-        keys_metadata_value = base64.b64encode(
-            json.dumps(keys_metadata).encode("utf-8")
-        ).decode("utf-8")
-
-        records.append(
-            {
-                "Data": {
-                    "account_id": account_id,
-                    "data_key": keys_metadata_key,
-                    "value": keys_metadata_value,
-                }
+        # Vector metadatas
+        for component in ["keys", "vals"]:
+            vec_metadata = {
+                "type": "v",  # 'v' for vector
+                "version": "1.0.0",
+                "length": num_elements,
             }
-        )
+            meta_key = base64.b64encode(f"items_{component}:meta".encode()).decode()
+            meta_value = base64.b64encode(json.dumps(vec_metadata).encode()).decode()
+            records.append(
+                {
+                    "Data": {
+                        "account_id": account_id,
+                        "data_key": meta_key,
+                        "value": meta_value,
+                    }
+                }
+            )
 
-        # Create records for all elements
+        # Create elements
         for i in range(num_elements):
-            # Create the key string
             key = f"key_{i}"
-
-            # 1. Create the values storage (LookupMap part)
             value = f"bulk_value_{i}"
-            value_storage_key = f"items:{key}"
-            encoded_value_key = base64.b64encode(
-                value_storage_key.encode("utf-8")
-            ).decode("utf-8")
-            encoded_value = base64.b64encode(json.dumps(value).encode("utf-8")).decode(
-                "utf-8"
-            )
 
+            # Serialize key to bytes and hex for index
+            key_bytes = key.encode()
+            key_hex = key_bytes.hex()
+
+            # 1. Add to keys vector
+            key_entry_key = base64.b64encode(f"items_keys:{i}".encode()).decode()
+            key_entry_value = base64.b64encode(json.dumps(key).encode()).decode()
             records.append(
                 {
                     "Data": {
                         "account_id": account_id,
-                        "data_key": encoded_value_key,
-                        "value": encoded_value,
+                        "data_key": key_entry_key,
+                        "value": key_entry_value,
                     }
                 }
             )
 
-            # 2. Create the keys vector storage (Vector part)
-            key_vector_storage_key = f"items:keys:{i}"
-            encoded_key_vector_key = base64.b64encode(
-                key_vector_storage_key.encode("utf-8")
-            ).decode("utf-8")
-            encoded_key = base64.b64encode(json.dumps(key).encode("utf-8")).decode(
-                "utf-8"
-            )
-
+            # 2. Add to values vector
+            val_entry_key = base64.b64encode(f"items_vals:{i}".encode()).decode()
+            val_entry_value = base64.b64encode(json.dumps(value).encode()).decode()
             records.append(
                 {
                     "Data": {
                         "account_id": account_id,
-                        "data_key": encoded_key_vector_key,
-                        "value": encoded_key,
+                        "data_key": val_entry_key,
+                        "value": val_entry_value,
                     }
                 }
             )
 
-            # 3. Create the indices mapping (key -> index in vector)
-            # This is the critical addition for efficient removal
-            index_storage_key = f"items:indices:{key}"
-            encoded_index_key = base64.b64encode(
-                index_storage_key.encode("utf-8")
-            ).decode("utf-8")
-            encoded_index_value = base64.b64encode(
-                json.dumps(i).encode("utf-8")
-            ).decode("utf-8")
-
+            # 3. Add index mapping (hex-encoded key)
+            index_key = base64.b64encode(f"items_indices:{key_hex}".encode()).decode()
+            index_value = base64.b64encode(str(i).encode()).decode()
             records.append(
                 {
                     "Data": {
                         "account_id": account_id,
-                        "data_key": encoded_index_key,
-                        "value": encoded_index_value,
+                        "data_key": index_key,
+                        "value": index_value,
                     }
                 }
             )
@@ -152,10 +138,17 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
 
     def test_unordered_map_bulk_operations(self):
         """Test operations on an unordered map with 10k elements."""
+
+        # self.map_contract.call(
+        #     method_name="set_item", args={"key": "key_0", "value": "bulk_value_0"}
+        # )
+        # self._sandbox.dump_state()
+        # return
+
         # Patch storage to create an unordered map with 10k elements
         num_elements = 10000
         self.patch_map_storage(num_elements)
-        self._sandbox.dump_state()
+        # self._sandbox.dump_state()
 
         # For storing performance data
         performance_data = []
@@ -392,3 +385,194 @@ class TestUnorderedMapBulkPerformance(NearTestCase):
         print(
             f"\nResults saved to: {results_dir}/unordered_map_performance_{num_elements}.md"
         )
+
+    def test_pagination_performance(self):
+        """Test pagination performance on an unordered map with many elements."""
+        # Patch storage to create an unordered map with many elements
+        num_elements = 10000
+        self.patch_map_storage(num_elements)
+
+        # For storing performance data
+        pagination_perf_data = []
+
+        # Get baseline gas usage for reference
+        response, tx_result = self.map_contract.call(
+            method_name="hello", return_full_result=True
+        )
+        hello_world_gas_usage = tx_result.receipt_outcome[0].gas_burnt / 10**12
+
+        # Define page sizes to test - starting with smaller page sizes
+        page_sizes = [5, 10, 20, 50]
+
+        print("\nTesting pagination performance...")
+
+        # First, verify the map has the expected number of elements
+        length, tx_result = self.map_contract.call(
+            "get_length", {}, return_full_result=True
+        )
+        actual_length = length.json()["length"]
+        print(f"Verified map length: {actual_length} (expected {num_elements})")
+
+        for page_size in page_sizes:
+            try:
+                # Test first page (start of map)
+                print(f"\nAttempting to fetch first page with size {page_size}...")
+                first_page_time_start = datetime.now()
+                result, tx_result = self.map_contract.call(
+                    "get_paginated_items",
+                    {"start_index": 0, "limit": page_size},
+                    return_full_result=True,
+                    gas=300 * 10**12,
+                )
+                first_page_time = (
+                    datetime.now() - first_page_time_start
+                ).total_seconds()
+                first_page_gas = tx_result.receipt_outcome[0].gas_burnt / 10**12
+
+                # Verify results
+                page_data = result.json()
+                print(f"  Received {page_data['page_count']} items in first page")
+
+                # Add to performance data
+                pagination_perf_data.append(
+                    {
+                        "operation": f"pagination_first_page_{page_size}",
+                        "gas_tgas": first_page_gas,
+                        "ratio": first_page_gas / hello_world_gas_usage,
+                        "details": f"First page with {page_size} items",
+                        "time_seconds": first_page_time,
+                    }
+                )
+
+                # Test middle page - but for safety, only test small jumps ahead
+                # This avoids large index calculations that might be problematic
+                middle_index = min(
+                    100, num_elements // 4
+                )  # More conservative middle point
+                print(f"  Attempting to fetch middle page at index {middle_index}...")
+                middle_page_time_start = datetime.now()
+                result, tx_result = self.map_contract.call(
+                    "get_paginated_items",
+                    {"start_index": middle_index, "limit": page_size},
+                    return_full_result=True,
+                    gas=300 * 10**12,
+                )
+                middle_page_time = (
+                    datetime.now() - middle_page_time_start
+                ).total_seconds()
+                middle_page_gas = tx_result.receipt_outcome[0].gas_burnt / 10**12
+
+                # Verify results
+                page_data = result.json()
+                print(f"  Received {page_data['page_count']} items in middle page")
+
+                # Add to performance data
+                pagination_perf_data.append(
+                    {
+                        "operation": f"pagination_middle_page_{page_size}",
+                        "gas_tgas": middle_page_gas,
+                        "ratio": middle_page_gas / hello_world_gas_usage,
+                        "details": f"Middle page (index {middle_index}) with {page_size} items",
+                        "time_seconds": middle_page_time,
+                    }
+                )
+
+                # Test jumping forward by page_size
+                next_page_index = middle_index + page_size
+                print(f"  Attempting to fetch next page at index {next_page_index}...")
+                next_page_time_start = datetime.now()
+                result, tx_result = self.map_contract.call(
+                    "get_paginated_items",
+                    {"start_index": next_page_index, "limit": page_size},
+                    return_full_result=True,
+                )
+                next_page_time = (datetime.now() - next_page_time_start).total_seconds()
+                next_page_gas = tx_result.receipt_outcome[0].gas_burnt / 10**12
+
+                # Verify results
+                page_data = result.json()
+                print(f"  Received {page_data['page_count']} items in next page")
+
+                # Add to performance data
+                pagination_perf_data.append(
+                    {
+                        "operation": f"pagination_next_page_{page_size}",
+                        "gas_tgas": next_page_gas,
+                        "ratio": next_page_gas / hello_world_gas_usage,
+                        "details": f"Next page (index {next_page_index}) with {page_size} items",
+                        "time_seconds": next_page_time,
+                    }
+                )
+
+                print(f"  Successfully tested pagination with page size {page_size}")
+
+            except Exception as e:
+                print(f"Error testing pagination with page size {page_size}: {str(e)}")
+                print("Skipping remaining tests for this page size")
+                continue
+
+        # Generate performance comparison table for pagination if we have data
+        if pagination_perf_data:
+            console = Console()
+
+            table = Table(
+                title=f"UnorderedMap Pagination Performance (Size: {num_elements} elements)"
+            )
+
+            table.add_column("Operation", style="cyan")
+            table.add_column("Gas (TGas)", justify="right", style="green")
+            table.add_column("vs. Baseline", justify="right", style="magenta")
+            table.add_column("Time (s)", justify="right", style="blue")
+            table.add_column("Details", style="yellow")
+
+            # Also prepare data for Markdown export
+            md_content = "# UnorderedMap Pagination Performance Test Results\n\n"
+            md_content += f"UnorderedMap size: {num_elements} elements\n\n"
+            md_content += (
+                "| Operation | Gas (TGas) | vs. Baseline | Time (s) | Details |\n"
+            )
+            md_content += (
+                "|-----------|------------|--------------|----------|----------|\n"
+            )
+
+            for entry in pagination_perf_data:
+                # Format the ratio to be more readable
+                ratio_str = f"{entry['ratio']:.2f}x"
+
+                # Format TGas to 4 decimal places
+                tgas_str = f"{entry['gas_tgas']:.4f}"
+
+                # Format time to 4 decimal places
+                time_str = f"{entry['time_seconds']:.4f}"
+
+                table.add_row(
+                    entry["operation"], tgas_str, ratio_str, time_str, entry["details"]
+                )
+
+                # Add to Markdown content
+                md_content += f"| {entry['operation']} | {tgas_str} | {ratio_str} | {time_str} | {entry['details']} |\n"
+
+            # Print to console
+            console.print(table)
+
+            # Save results to Markdown file
+            md_content += "\n\n## Test Information\n\n"
+            md_content += (
+                f"- Date/Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            )
+
+            # Create results directory if it doesn't exist
+            results_dir = "performance_results"
+            os.makedirs(results_dir, exist_ok=True)
+
+            # Save to file
+            with open(
+                f"{results_dir}/unordered_map_pagination_{num_elements}.md", "w"
+            ) as f:
+                f.write(md_content)
+
+            print(
+                f"\nPagination results saved to: {results_dir}/unordered_map_pagination_{num_elements}.md"
+            )
+        else:
+            print("No pagination performance data was collected due to errors.")
