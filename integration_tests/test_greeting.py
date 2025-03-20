@@ -36,7 +36,9 @@ class TestSimpleGreetingContract(NearTestCase):
 
     def test_get_greeting_default(self):
         """Test retrieving the default greeting."""
-        greeting = self.instance.call_as(account=self.alice, method_name="get_greeting")
+        greeting = self.instance.call_as(
+            account=self.alice, method_name="get_greeting"
+        ).text
 
         assert greeting == "Initial greeting"
 
@@ -53,7 +55,9 @@ class TestSimpleGreetingContract(NearTestCase):
         assert response["success"] is True
 
         # Verify the greeting was updated
-        greeting = self.instance.call_as(account=self.alice, method_name="get_greeting")
+        greeting = self.instance.call_as(
+            account=self.alice, method_name="get_greeting"
+        ).text
 
         assert greeting == new_greeting
 
