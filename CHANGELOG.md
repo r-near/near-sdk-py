@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.7.2 (2025-03-21)
+
+### Bug Fixes
+
+- **decorators**: Clean up debug messages
+  ([`27c00f6`](https://github.com/r-near/near-sdk-py/commit/27c00f69ad9a062c06dd3d219866b9db283d0bf3))
+
+
 ## v0.7.1 (2025-03-21)
 
 ### Bug Fixes
