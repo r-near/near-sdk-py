@@ -28,17 +28,14 @@ def contract_method(func):
             if len(kwargs) == 0 and len(args) <= 1:
                 try:
                     data = Input.string()
-                    Log.debug(f"Input data: {data}")
                     if len(data) > 0:
                         # Try parsing it as JSON
                         kwargs = json.loads(data)
-                        Log.debug(f"Parsed kwargs: {kwargs}")
                 except Exception as e:
                     # Don't panic, but we might want to log this
                     Log.warning(f"Failed to parse input as JSON: {e}")
                     pass
 
-            Log.debug(f"Calling function {func.__name__} with kwargs: {kwargs}")
             # Call the actual function
             result = func(*args, **kwargs)
 
@@ -51,7 +48,6 @@ def contract_method(func):
                 else:
                     ValueReturn.json(result)
 
-            Log.debug(f"Function {func.__name__} returned: {result}")
             return result
 
         except ContractPanic as e:
