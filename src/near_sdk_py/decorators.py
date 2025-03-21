@@ -21,9 +21,6 @@ def contract_method(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            Log.debug(
-                f"Contract method {func.__name__} called with args: {args}, kwargs: {kwargs}"
-            )
             # If no kwargs were provided and this appears to be a blockchain call
             if len(kwargs) == 0 and len(args) <= 1:
                 try:
