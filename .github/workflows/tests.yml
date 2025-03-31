@@ -52,7 +52,14 @@ jobs:
       - name: Install self into venv
         run: uv pip install .
 
-      - name: Run tests
+      - name: Run integration tests
         run: |
             source .venv/bin/activate
             NEAR_PYTEST_LOG_LEVEL=DEBUG pytest -xvs integration_tests/
+
+      - name: Run example tests
+        run: |
+          source .venv/bin/activate
+          NEAR_PYTEST_LOG_LEVEL=DEBUG pytest -xvs examples/
+    
+     
