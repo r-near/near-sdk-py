@@ -7,7 +7,7 @@ from typing import Any, Iterator, Optional, Tuple  # Keep typing for docs
 import near
 
 from .adapter import CollectionStorageAdapter
-from .base import PrefixType
+from .base import Collection, PrefixType
 from .lookup_map import LookupMap
 from .vector import Vector
 
@@ -27,9 +27,7 @@ class UnorderedMap(LookupMap):
         Args:
             prefix: A unique string prefix for this collection
         """
-        super().__init__(prefix)
-        # Override the collection type
-        self._update_metadata({"type": PrefixType.UNORDERED_MAP})
+        Collection.__init__(self, prefix, PrefixType.UNORDERED_MAP)
 
         # Key for storing the list of keys
         self._keys_prefix = f"{prefix}:keys"
