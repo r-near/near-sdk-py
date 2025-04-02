@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v0.7.3 (2025-04-02)
+
+### Bug Fixes
+
+- Writing in storage at init unordered_map.py ([#29](https://github.com/r-near/near-sdk-py/pull/29),
+  [`5bcfa4b`](https://github.com/r-near/near-sdk-py/commit/5bcfa4be3e1981ecf2e8741c84cf4d87a4588253))
+
+instead call constructor LookupMap and overwrite metadata in storage, we call directly constructor
+  of Collections.
+
+### Chores
+
+- Create LICENSE
+  ([`55d1b07`](https://github.com/r-near/near-sdk-py/commit/55d1b078d68ee1f1e45cce222f3efc207718b3e9))
+
+
 ## v0.7.2 (2025-03-21)
 
 ### Bug Fixes
