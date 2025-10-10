@@ -555,7 +555,7 @@ wheels = [
 
 [[package]]
 name = "near-pytest"
-version = "0.7.1"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "base58" },
@@ -565,14 +565,14 @@ dependencies = [
     { name = "pytest" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/25/ec/95af3b9c9ed1404564e5e1f8f5bb20b4aea0e533e16065312fd3cb661100/near_pytest-0.7.1.tar.gz", hash = "sha256:0e2468847e39b64a92d97c786e3cc9133a60733b8acf04b4a8f8bc2a5f1fc000", size = 71032, upload-time = "2025-03-20T01:17:12.6Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/21/1d/04a5e1233ef5cfaa32141da2ff94dc0cab80ec9cb8c1a3c0303f6f4bc4b8/near_pytest-1.0.0.tar.gz", hash = "sha256:4763b22ebbb3947788b7c751bf8db690ef5c0e4e38779deea1fe50fe0091e6c1", size = 72114, upload-time = "2025-09-02T05:51:02.31Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/0c/0fef87edfce405a5a32e19fef6f67ffebb6ced54e2ddef811fbfcce4c8fa/near_pytest-0.7.1-py3-none-any.whl", hash = "sha256:434a79d6b513ba93c894c62f68bbe170b008fa58a30334293893c2257860340f", size = 22004, upload-time = "2025-03-20T01:17:11.415Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/ca/09738fe4f73168c9f2424a173a67108915986911194cb046845c76325edf/near_pytest-1.0.0-py3-none-any.whl", hash = "sha256:5f92c40a7bab2c2779e7fb3127e8b4ea6ba2abb3e3ab9074aec8118aa404e2c2", size = 22856, upload-time = "2025-09-02T05:51:01.545Z" },
 ]
 
 [[package]]
 name = "near-sdk-py"
-version = "0.7.3"
+version = "1.0.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
